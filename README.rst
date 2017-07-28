@@ -1,0 +1,100 @@
+.. image:: https://img.shields.io/travis/sjaensch/bravado-asyncio.svg
+  :target: https://travis-ci.org/sjaensch/bravado-asyncio?branch=master
+
+.. image:: https://img.shields.io/coveralls/sjaensch/bravado-asyncio.svg
+  :target: https://coveralls.io/r/sjaensch/bravado-asyncio
+
+.. image:: https://img.shields.io/pypi/v/bravado-asyncio.svg
+    :target: https://pypi.python.org/pypi/bravado-asyncio/
+    :alt: PyPi version
+
+.. image:: https://img.shields.io/pypi/pyversions/bravado-asyncio.svg
+    :target: https://pypi.python.org/pypi/bravado-asyncio/
+    :alt: Supported Python versions
+
+
+bravado-asyncio
+===============
+
+``bravado-asyncio`` is an asynchronous HTTP client for the `bravado library <https://github.com/Yelp/bravado>`__.
+It uses Python's ``asyncio`` and `aiohttp <http://aiohttp.readthedocs.io/en/stable/>`__ internally. It enables
+you to do concurrent network requests with bravado, similar to the `fido client <https://github.com/Yelp/fido>`__.
+Unlike fido, ``bravado-asyncio`` does not depend on crochet or twisted and uses Python 3's standard library
+to implement asynchronous behavior.
+
+*Note*: This is not a fork or reimplementation of bravado using asynchronous programming (like aiomysql is for PyMySQL).
+The interface of bravado remains unchanged.
+
+
+Example usage
+-------------
+
+If you're familiar with bravado then all you need to do is switch out (or specify) your HTTP client:
+
+.. code-block:: python
+
+    from bravado_asyncio.http_client import AsyncioClient
+    from bravado.client import SwaggerClient
+
+    client = SwaggerClient.from_url(
+        'http://petstore.swagger.io/v2/swagger.json',
+        http_client=AsyncioClient(),
+    )
+    pet = client.pet.getPetById(petId=42).result()
+
+
+Installation
+------------
+
+.. code-block:: bash
+
+    # This will install bravado-asyncio and bravado
+    $ pip install bravado-asyncio
+
+    # To install bravado-asyncio with the optional cchardet and aiodns packages,
+    # which are recommended by the underlying aiohttp package
+    $ pip install bravado-asyncio[aiohttp_extras]
+
+
+Project status
+--------------
+
+The project is very much work in progress. Expect bugs. If you find any, please file an issue!
+
+Internal as well as external interfaces may change at any time currently. That said, since bravado expects
+the HTTP client to adhere to a specific interface, those parts should be relatively stable.
+
+
+Development and contributing
+----------------------------
+
+Developing ``bravado-asyncio`` requires a working installation of Python 3.5 or 3.6 with the virtualenv package being installed.
+All other requirements will be installed in a virtualenv created in the ``venv`` directory.
+
+ 1. Run ``make``. This will create the virtualenv you will use for development, with all runtime and development
+    dependencies installed.
+ 2. If you're using `aactivator <https://github.com/Yelp/aactivator>`__ then you will be prompted to activate the new
+    environment, please do so. If you prefer not to use aactivator, do ``source .activate.sh``.
+ 3. Make sure everything is set up correctly by running ``make test``.
+
+Note that ``make test`` will try running the tests both with Python 3.5 and Python 3.6. It's totally fine if you have
+only one of the two installed - just make sure that at least one of the two suites passes. Use
+
+.. code-block:: bash
+     $ tox -e cover
+
+to run the tests only with your installe
+Great, you're ready to go! If you have an improvement or bugfix, please submit a pull request.
+
+
+The event loop
+--------------
+
+``bravado-asyncio`` creates its own event loop in a separate thread. This is necessary as it is not possible to use the
+main event loop - it would require a fork of bravado, making its public interface asynchronous. That said,
+``bravado-asyncio`` and bravado should work well with your existing asyncio application.
+
+You shouldn't normally need to interact with ``bravado-asyncio``'s event loop. If you do need to do so please use
+``bravado_asyncio.http_client.get_loop()`` to retrieve it. Note that it won't be the currently active loop!
+
+license / copyright
