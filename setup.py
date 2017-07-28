@@ -5,7 +5,7 @@ from setuptools import setup
 
 
 setup(
-    name='bravado_asyncio',
+    name='bravado-asyncio',
     version='0.1.0',
     license='BSD 3-Clause License',
     description='asyncio powered HTTP client for bravado',
