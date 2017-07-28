@@ -1,0 +1,17 @@
+language: python
+
+matrix:
+  include:
+  - env: TOXENV=py35
+    python: "3.5"
+  - env: TOXENV=cover
+    python: "3.6"
+
+install:
+- "pip install tox coveralls"
+script:
+- tox -e $TOXENV
+after_success:
+- coveralls
+# Faster runs on container based infrastucture
+sudo: false
