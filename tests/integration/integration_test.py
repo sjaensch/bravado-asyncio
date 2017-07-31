@@ -18,7 +18,7 @@ def swagger_client(integration_server, request):
     # to make sure they both behave the same.
     # Once this integration suite has become stable (i.e. we're happy with the approach and the test coverage)
     # it could move to bravado and test all major HTTP clients (requests, fido, asyncio).
-    spec_url = f'{integration_server}/swagger.yaml'
+    spec_url = '{}/swagger.yaml'.format(integration_server)
     return SwaggerClient.from_url(
         spec_url,
         http_client=request.param(),
