@@ -16,9 +16,9 @@
 bravado-asyncio
 ===============
 
-``bravado-asyncio`` is an asynchronous HTTP client for the `bravado library <https://github.com/Yelp/bravado>`__.
-It uses Python's ``asyncio`` and `aiohttp <http://aiohttp.readthedocs.io/en/stable/>`__ internally. It enables
-you to do concurrent network requests with bravado, similar to the `fido client <https://github.com/Yelp/fido>`__.
+``bravado-asyncio`` is an asynchronous HTTP client for the `bravado library <https://github.com/Yelp/bravado>`_.
+It uses Python's ``asyncio`` and `aiohttp <http://aiohttp.readthedocs.io/en/stable/>`_ internally. It enables
+you to do concurrent network requests with bravado, similar to the `fido client <https://github.com/Yelp/fido>`_.
 Unlike fido, ``bravado-asyncio`` does not depend on crochet or twisted and uses Python 3's standard library
 to implement asynchronous behavior.
 
@@ -68,22 +68,29 @@ the HTTP client to adhere to a specific interface, those parts should be relativ
 Development and contributing
 ----------------------------
 
-Developing ``bravado-asyncio`` requires a working installation of Python 3.5 or 3.6 with the virtualenv package being installed.
+Developing ``bravado-asyncio`` requires a working installation of Python 3.5 or 3.6 with the
+`virtualenv <https://virtualenv.pypa.io/en/stable/>`_ package being installed.
 All other requirements will be installed in a virtualenv created in the ``venv`` directory.
 
- 1. Run ``make``. This will create the virtualenv you will use for development, with all runtime and development
-    dependencies installed.
- 2. If you're using `aactivator <https://github.com/Yelp/aactivator>`__ then you will be prompted to activate the new
-    environment, please do so. If you prefer not to use aactivator, do ``source .activate.sh``.
- 3. Make sure everything is set up correctly by running ``make test``.
+1. Run ``make``. This will create the virtualenv you will use for development, with all runtime and development
+   dependencies installed.
+2. If you're using `aactivator <https://github.com/Yelp/aactivator>`_ then you will be prompted to activate the new
+   environment, please do so. If you prefer not to use aactivator, do ``source .activate.sh``.
+3. Make sure everything is set up correctly by running ``make test``.
 
-Note that ``make test`` will try running the tests both with Python 3.5 and Python 3.6. It's totally fine if you have
-only one of the two installed - just make sure that at least one of the two suites passes. Use
+Note that ``make test`` will run the tests with whatever version of Python 3 you have installed - i.e. whatever
+version ``python3`` points to. Adjust your shell path settings accordingly to use a different Python version.
+Alternatively, you can ask tox to run tests with a specific Python version like so:
 
 .. code-block:: bash
-     $ tox -e cover
 
-to run the tests only with your installe
+     $ tox -e py36
+
+This will run tests with Python 3.6.
+
+Travis (the continuous integration system) will run tests with both Python 3.5 and Python 3.6, so make sure you don't
+write code that works on Python 3.6 only.
+
 Great, you're ready to go! If you have an improvement or bugfix, please submit a pull request.
 
 
