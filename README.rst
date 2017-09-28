@@ -104,4 +104,8 @@ main event loop - it would require a fork of bravado, making its public interfac
 You shouldn't normally need to interact with ``bravado-asyncio``'s event loop. If you do need to do so please use
 ``bravado_asyncio.http_client.get_loop()`` to retrieve it. Note that it won't be the currently active loop!
 
-license / copyright
+
+License
+-------
+
+Written by Stephan Jaensch and licensed under the BSD 3-clause license (see `LICENSE.txt <https://github.com/sjaensch/bravado-asyncio/blob/master/LICENSE.txt>`_).
