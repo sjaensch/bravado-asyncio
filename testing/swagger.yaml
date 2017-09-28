@@ -135,6 +135,11 @@ paths:
         description: "file to upload"
         required: false
         type: "file"
+      - name: "userId"
+        in: "formData"
+        description: "ID of the user updating the pet"
+        required: true
+        type: "integer"
       responses:
         200:
           description: "successful operation"

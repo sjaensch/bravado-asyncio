@@ -8,6 +8,7 @@ from typing import NamedTuple
 from typing import Optional
 
 import aiohttp
+from aiohttp.formdata import FormData
 from bravado.http_client import HttpClient
 from bravado.http_future import FutureAdapter
 from bravado.http_future import HttpFuture
@@ -105,13 +106,25 @@ class AsyncioClient(HttpClient):
         """
 
         client_session = get_client_session()
-        data = request_params.get('data', {})
-        files = request_params.get('files', {})
-        if isinstance(data, Mapping) and files:
-            data.update({
-                field_name: file_tuple[1]
-                for field_name, file_tuple in files
-            })
+
+        orig_data = request_params.get('data', {})
+        if isinstance(orig_data, Mapping):
+            data = FormData()
+            for name, value in orig_data.items():
+                data.add_field(name, str(value))
+        else:
+            data = orig_data
+
+        if isinstance(data, FormData):
+            for name, file_tuple in request_params.get('files', {}):
+                stream_obj = file_tuple[1]
+                if not hasattr(stream_obj, 'name') or not isinstance(stream_obj.name, str):
+                    # work around an issue in aiohttp: it's not able to deal with names of type int. We've observed
+                    # this case in the real world and it is a documented possibility:
+                    # https://docs.python.org/3/library/io.html#raw-file-i-o
+                    stream_obj = stream_obj.read()
+
+                data.add_field(name, stream_obj, filename=file_tuple[0])
 
         params = self.prepare_params(request_params.get('params'))
         coroutine = client_session.request(
@@ -137,8 +150,7 @@ class AsyncioClient(HttpClient):
             return params
 
         prepared_params = {
-            name: str(value) if not isinstance(value, str) else value
-            for name, value in params.items()
+            name: str(value) for name, value in params.items()
         }
         return prepared_params
 

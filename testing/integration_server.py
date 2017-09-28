@@ -58,13 +58,17 @@ async def update_pet_formdata(request):
 async def upload_pet_image(request):
     with open(os.path.join(os.path.dirname(__file__), 'sample.jpg'), 'rb') as f:
         data = await request.post()
-        print(data)
         file_data = data.get('file')
-        print(file_data)
         content = file_data.file.read()
         expected_content = f.read()
 
     if content != expected_content:
+        return web.HTTPBadRequest()
+
+    if not (
+        request.match_info['petId'] == '42'
+        and data.get('userId') == '12'
+    ):
         return web.HTTPBadRequest()
 
     return web.json_response({})
