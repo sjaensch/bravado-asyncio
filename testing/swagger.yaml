@@ -97,6 +97,11 @@ paths:
         description: "Updated status of the pet"
         required: false
         type: "string"
+      - name: "userId"
+        in: "header"
+        description: "The uploading user ID"
+        required: true
+        type: "integer"
       responses:
         200:
           description: "Successful operation"
@@ -174,6 +179,11 @@ paths:
         description: "The password for login in clear text"
         required: true
         type: "string"
+      - name: "invalidate_sessions"
+        in: "query"
+        description: "Should existing sessions be invalidated?"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "successful operation"

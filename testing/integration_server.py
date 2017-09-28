@@ -17,7 +17,11 @@ async def store_inventory(request):
 
 
 async def login(request):
-    if not (request.query.get('username') == 'asyncio' and request.query.get('password') == 'password'):
+    if not (
+        request.query.get('username') == 'asyncio'
+        and request.query.get('password') == 'password'
+        and request.query.get('invalidate_sessions') == 'True'
+    ):
         return web.HTTPBadRequest()
 
     return web.json_response('success', headers={
@@ -44,6 +48,7 @@ async def update_pet_formdata(request):
         request.match_info['petId'] == '12'
         and post_data.get('name') == 'Vivi'
         and post_data.get('status') == 'sold'
+        and request.headers.get('userId') == '42'
     ):
         return web.HTTPNotFound()
 

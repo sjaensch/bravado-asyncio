@@ -113,10 +113,11 @@ class AsyncioClient(HttpClient):
                 for field_name, file_tuple in files
             })
 
+        params = self.prepare_params(request_params.get('params'))
         coroutine = client_session.request(
             method=request_params.get('method') or 'GET',
             url=request_params.get('url'),
-            params=request_params.get('params'),
+            params=params,
             data=data,
             headers=request_params.get('headers'),
         )
@@ -130,6 +131,16 @@ class AsyncioClient(HttpClient):
             response_callbacks,
             also_return_response,
         )
+
+    def prepare_params(self, params):
+        if not params:
+            return params
+
+        prepared_params = {
+            name: str(value) if not isinstance(value, str) else value
+            for name, value in params.items()
+        }
+        return prepared_params
 
 
 class AsyncioFutureAdapter(FutureAdapter):

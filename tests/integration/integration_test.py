@@ -27,7 +27,11 @@ def swagger_client(integration_server, request):
 
 
 def test_get_query_args(swagger_client):
-    result, response = swagger_client.user.loginUser(username='asyncio', password='password').result(timeout=1)
+    result, response = swagger_client.user.loginUser(
+        username='asyncio',
+        password='password',
+        invalidate_sessions=True,
+    ).result(timeout=1)
 
     assert result == 'success'
     # let's make sure we can access the headers through the response object
@@ -44,7 +48,12 @@ def test_response_headers(swagger_client):
 
 
 def test_post_form_data(swagger_client):
-    result, _ = swagger_client.pet.updatePetWithForm(petId=12, name='Vivi', status='sold').result(timeout=1)
+    result, _ = swagger_client.pet.updatePetWithForm(
+        petId=12,
+        name='Vivi',
+        status='sold',
+        userId=42,
+    ).result(timeout=1)
     assert result is None
 
 

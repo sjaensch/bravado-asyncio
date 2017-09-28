@@ -1,8 +1,8 @@
 .. image:: https://img.shields.io/travis/sjaensch/bravado-asyncio.svg
   :target: https://travis-ci.org/sjaensch/bravado-asyncio?branch=master
 
-.. image:: https://img.shields.io/coveralls/sjaensch/bravado-asyncio.svg
-  :target: https://coveralls.io/r/sjaensch/bravado-asyncio
+.. image:: https://coveralls.io/repos/github/sjaensch/bravado-asyncio/badge.svg?branch=master
+  :target: https://coveralls.io/github/sjaensch/bravado-asyncio?branch=master
 
 .. image:: https://img.shields.io/pypi/v/bravado-asyncio.svg
     :target: https://pypi.python.org/pypi/bravado-asyncio/
