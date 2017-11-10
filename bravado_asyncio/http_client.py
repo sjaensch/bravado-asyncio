@@ -70,6 +70,11 @@ class AioHTTPResponseAdapter(IncomingResponse):
         return future.result(self._remaining_timeout)
 
     @property
+    def raw_bytes(self):
+        future = asyncio.run_coroutine_threadsafe(self._delegate.read(), get_loop())
+        return future.result(self._remaining_timeout)
+
+    @property
     def reason(self):
         return self._delegate.reason
 
@@ -156,6 +161,9 @@ class AsyncioClient(HttpClient):
 
 
 class AsyncioFutureAdapter(FutureAdapter):
+
+    timeout_errors = (concurrent.futures.TimeoutError,)
+
     def __init__(self, future: concurrent.futures.Future) -> None:
         self.future = future
 

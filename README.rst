@@ -59,7 +59,9 @@ Installation
 Project status
 --------------
 
-The project is very much work in progress. Expect bugs. If you find any, please file an issue!
+The project is still work in progress, although it is successfully used in production at Yelp. We have an integration
+test suite that not only covers bravado-asyncio behavior, but also makes sure that behavior is equal to the (default)
+synchronous bravado HTTP client. That said, if you find a bug please file an issue!
 
 Internal as well as external interfaces may change at any time currently. That said, since bravado expects
 the HTTP client to adhere to a specific interface, those parts should be relatively stable.

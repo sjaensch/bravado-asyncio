@@ -1,5 +1,8 @@
+bravado-core>=4.11.0
+bravado>=9.2.0
 coverage
 ephemeral_port_reserve
 mock
 pytest
 tox
+u-msgpack-python
