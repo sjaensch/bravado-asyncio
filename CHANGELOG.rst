@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.3.0 (2017-11-13)
+------------------
+- Add support for msgpack as a wire protocol for responses - PR #1
+- Timeout exceptions now inherit from ``bravado.exception.TimeoutError`` as well as the builtin ``TimeoutError`` if you
+  use bravado 9.2.0 or higher - PR #1
+
 0.2.0 (2017-09-28)
 ------------------
 - Make sure file uploads work correctly when the data is coming from Pyramid
