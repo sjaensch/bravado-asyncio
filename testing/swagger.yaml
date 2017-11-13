@@ -107,6 +107,28 @@ paths:
           description: "Successful operation"
         404:
           description: "Pet not found"
+  /pet/search:
+    get:
+      tags:
+      - "pet"
+      summary: "Find pet by Name"
+      description: "Returns all pets matching the name"
+      operationId: "getPetsByName"
+      produces:
+      - "application/msgpack"
+      parameters:
+      - name: "petName"
+        in: "query"
+        description: "Name or part of the name of the pet"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Pet"
   /pet/{petId}/uploadImage:
     post:
       tags:

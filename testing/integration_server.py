@@ -2,6 +2,7 @@ import argparse
 import asyncio
 import os.path
 
+import umsgpack
 from aiohttp import web
 
 
@@ -40,6 +41,20 @@ async def get_pet(request):
         'name': 'Lili',
         'photoUrls': [],
     })
+
+
+async def search_pets(request):
+    pet_name = request.query['petName']
+    if pet_name == 'lili':
+        response = [{
+            'id': 42,
+            'name': 'Lili',
+            'photoUrls': [],
+        }]
+    else:
+        response = []
+
+    return web.Response(body=umsgpack.packb(response), content_type='application/msgpack')
 
 
 async def update_pet_formdata(request):
@@ -103,6 +118,7 @@ def setup_routes(app):
     app.router.add_get('/swagger.yaml', swagger_spec)
     app.router.add_get('/store/inventory', store_inventory)
     app.router.add_get('/user/login', login)
+    app.router.add_get('/pet/search', search_pets)
     app.router.add_get('/pet/{petId}', get_pet)
     app.router.add_post('/pet/{petId}', update_pet_formdata)
     app.router.add_post('/pet/{petId}/uploadImage', upload_pet_image)

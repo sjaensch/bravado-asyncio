@@ -6,6 +6,7 @@ import time
 import pytest
 from bravado import requests_client
 from bravado.client import SwaggerClient
+from bravado.exception import BravadoTimeoutError
 from bravado.exception import HTTPBadRequest
 from bravado.exception import HTTPInternalServerError
 from bravado.exception import HTTPNotFound
@@ -99,6 +100,21 @@ def test_post_file_upload_stream_no_name(swagger_client):
         ).result(timeout=1)
 
 
+def test_get_msgpack(swagger_client):
+    result, response = swagger_client.pet.getPetsByName(petName='lili').result(timeout=1)
+
+    assert len(result) == 1
+    assert result[0]._as_dict() == {
+        'id': 42,
+        'name': 'Lili',
+        'photoUrls': [],
+        'category': None,
+        'status': None,
+        'tags': None,
+    }
+    assert response.headers['Content-Type'] == 'application/msgpack'
+
+
 def test_server_400(swagger_client):
     with pytest.raises(HTTPBadRequest):
         swagger_client.user.loginUser(username='not', password='correct').result(timeout=1)
@@ -114,11 +130,25 @@ def test_server_500(swagger_client):
         swagger_client.pet.deletePet(petId=42).result(timeout=1)
 
 
+def test_timeout(swagger_client):
+    with pytest.raises(BravadoTimeoutError):
+        bravado_future = swagger_client.store.getInventory()
+        bravado_future.result(timeout=0.1)
+
+
 def test_client_from_asyncio(integration_server):
     """Let's make sure that the event loop for our HTTP client that runs in a different thread
     behaves properly with the 'standard' asyncio loop that people would normally use when doing
     asynchronous programming. While we're at it, let's also make sure two instances of
     AsyncioClient work well together."""
+    # recreate the separate event loop and client session for the HTTP client so we start with a clean slate
+    # this is important since we measure the time this test takes, and the test_timeout() tasks might
+    # interfere with it
+    http_client.client_session.close()
+    http_client.client_session = None
+    # not going to properly shut down the running loop, this will be cleaned up on exit
+    http_client.loop = None
+
     loop = asyncio.get_event_loop()
     start_time = time.time()
     loop.run_until_complete(_test_asyncio_client(integration_server))
