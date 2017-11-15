@@ -10,7 +10,7 @@ test: devenv
 	venv/bin/tox
 
 venv:
-	virtualenv -p python3 venv
+	virtualenv -p python3.6 venv
 
 .PHONY: clean
 clean:
