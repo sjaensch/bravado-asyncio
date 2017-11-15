@@ -70,9 +70,10 @@ the HTTP client to adhere to a specific interface, those parts should be relativ
 Development and contributing
 ----------------------------
 
-Developing ``bravado-asyncio`` requires a working installation of Python 3.5 or 3.6 with the
+Developing ``bravado-asyncio`` requires a working installation of Python 3.6 with the
 `virtualenv <https://virtualenv.pypa.io/en/stable/>`_ package being installed.
-All other requirements will be installed in a virtualenv created in the ``venv`` directory.
+All other requirements will be installed in a virtualenv created in the ``venv`` directory. A full run of our testsuite
+runs the tests against Python 3.5 and 3.6, so if you want that to work you should install Python 3.5 as well.
 
 1. Run ``make``. This will create the virtualenv you will use for development, with all runtime and development
    dependencies installed.
@@ -80,15 +81,16 @@ All other requirements will be installed in a virtualenv created in the ``venv``
    environment, please do so. If you prefer not to use aactivator, do ``source .activate.sh``.
 3. Make sure everything is set up correctly by running ``make test``.
 
-Note that ``make test`` will run the tests with whatever version of Python 3 you have installed - i.e. whatever
-version ``python3`` points to. Adjust your shell path settings accordingly to use a different Python version.
-Alternatively, you can ask tox to run tests with a specific Python version like so:
+Since ``make test`` will run tests with Python 3.5 and 3.6, you'll get an error if only one of them is installed.
+You can ask tox to run tests with a specific Python version like so:
 
 .. code-block:: bash
 
-     $ tox -e py36
+     $ tox -e py35
 
-This will run tests with Python 3.6.
+This will run tests with Python 3.5.
+
+We do run linters that currently require Python 3.6. You can run them with ``tox -e pre-commit``.
 
 Travis (the continuous integration system) will run tests with both Python 3.5 and Python 3.6, so make sure you don't
 write code that works on Python 3.6 only.

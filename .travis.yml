@@ -6,6 +6,8 @@ matrix:
     python: "3.5"
   - env: TOXENV=cover
     python: "3.6"
+  - env: TOXENV=pre-commit
+    python: "3.6"
 
 install:
 - "pip install tox coveralls"
