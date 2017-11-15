@@ -4,7 +4,7 @@ matrix:
   include:
   - env: TOXENV=py35
     python: "3.5"
-  - env: TOXENV=cover
+  - env: TOXENV=py36
     python: "3.6"
   - env: TOXENV=pre-commit
     python: "3.6"
