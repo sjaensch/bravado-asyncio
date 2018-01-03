@@ -13,6 +13,7 @@ from bravado.http_client import HttpClient
 from bravado.http_future import FutureAdapter
 from bravado.http_future import HttpFuture
 from bravado_core.response import IncomingResponse
+from multidict import MultiDict
 
 log = logging.getLogger(__name__)
 
@@ -154,10 +155,13 @@ class AsyncioClient(HttpClient):
         if not params:
             return params
 
-        prepared_params = {
-            name: str(value) for name, value in params.items()
-        }
-        return prepared_params
+        items = []
+        for key, value in params.items():
+            if isinstance(value, list):
+                items.extend((key, str(item)) for item in value)
+            else:
+                items.append((key, str(value)))
+        return MultiDict(items)
 
 
 class AsyncioFutureAdapter(FutureAdapter):
