@@ -167,6 +167,36 @@ paths:
           description: "successful operation"
         400:
           description: "data incorrect"
+  /pets:
+    get:
+      tags:
+      - "pet"
+      summary: "Find pets by ID"
+      description: "Returns a list of pets"
+      operationId: "getPetsByIds"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "petIds"
+        in: "query"
+        description: "IDs of pets to return"
+        required: true
+        type: "array"
+        items:
+          type: "integer"
+          format: "int64"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Pet"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Pet not found"
   /store/inventory:
     get:
       tags:
