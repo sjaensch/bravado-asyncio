@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.3.2 (2018-01-03)
+------------------
+- Add support for multiple values per query param (``collectionFormat: multi`` in OpenAPI/Swagger) - PR #3
+
 0.3.1 (2017-11-15)
 ------------------
 - Rework build system to specify Python versions explicitly; you'll need Python 3.6 for bravado-asyncio development - PR #2

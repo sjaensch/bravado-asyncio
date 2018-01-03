@@ -6,7 +6,7 @@ from setuptools import setup
 
 setup(
     name='bravado-asyncio',
-    version='0.3.1',
+    version='0.3.2',
     license='BSD 3-Clause License',
     description='asyncio powered HTTP client for bravado',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
