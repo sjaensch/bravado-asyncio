@@ -41,6 +41,30 @@ def test_get_query_args(swagger_client):
     assert response.headers['X-Expires-After'] == 'Expiration date'
 
 
+def test_param_multi(swagger_client):
+    result, response = swagger_client.pet.getPetsByIds(
+        petIds=[23, 42],
+    ).result(timeout=1)
+
+    assert len(result) == 2
+    assert result[0]._as_dict() == {
+        'id': 23,
+        'name': 'Takamoto',
+        'photoUrls': [],
+        'category': None,
+        'status': None,
+        'tags': None,
+    }
+    assert result[1]._as_dict() == {
+        'id': 42,
+        'name': 'Lili',
+        'photoUrls': [],
+        'category': None,
+        'status': None,
+        'tags': None,
+    }
+
+
 def test_response_headers(swagger_client):
     """Make sure response headers are returned in the same format across HTTP clients. Namely,
     make sure names and values are str, and that it's possible to access headers in a

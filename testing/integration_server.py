@@ -114,6 +114,25 @@ async def delete_pet(request):
     return web.json_response({})
 
 
+async def get_pets(request):
+    pet_ids = request.query.getall('petIds')
+    if pet_ids != ['23', '42']:
+        return web.HTTPNotFound()
+
+    pets = [
+        {
+            'id': 23,
+            'name': 'Takamoto',
+            'photoUrls': [],
+        }, {
+            'id': 42,
+            'name': 'Lili',
+            'photoUrls': [],
+        },
+    ]
+    return web.json_response(pets)
+
+
 def setup_routes(app):
     app.router.add_get('/swagger.yaml', swagger_spec)
     app.router.add_get('/store/inventory', store_inventory)
@@ -124,6 +143,7 @@ def setup_routes(app):
     app.router.add_post('/pet/{petId}/uploadImage', upload_pet_image)
     app.router.add_put('/pet', update_pet)
     app.router.add_delete('/pet', delete_pet)
+    app.router.add_get('/pets', get_pets)
 
 
 if __name__ == '__main__':
