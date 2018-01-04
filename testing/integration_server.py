@@ -64,6 +64,7 @@ async def update_pet_formdata(request):
         and post_data.get('name') == 'Vivi'
         and post_data.get('status') == 'sold'
         and request.headers.get('userId') == '42'
+        and post_data.getall('photoUrls') == ['http://first.url', 'http://second.url']
     ):
         return web.HTTPNotFound()
 

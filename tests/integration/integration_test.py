@@ -79,6 +79,7 @@ def test_post_form_data(swagger_client):
         name='Vivi',
         status='sold',
         userId=42,
+        photoUrls=('http://first.url', 'http://second.url'),
     ).result(timeout=1)
     assert result is None
 
