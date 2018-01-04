@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.3.3 (2018-01-04)
+------------------
+- Support ``collectionFormat: multi`` for array formData params as well - PR #4
+
 0.3.2 (2018-01-03)
 ------------------
 - Add support for multiple values per query param (``collectionFormat: multi`` in OpenAPI/Swagger) - PR #3
