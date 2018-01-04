@@ -102,6 +102,14 @@ paths:
         description: "The uploading user ID"
         required: true
         type: "integer"
+      - name: "photoUrls"
+        in: "formData"
+        description: "New Photo URLs for the pet"
+        required: false
+        type: "array"
+        collectionFormat: "multi"
+        items:
+          type: "string"
       responses:
         200:
           description: "Successful operation"

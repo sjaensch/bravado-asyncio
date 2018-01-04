@@ -13,6 +13,7 @@ from bravado.http_client import HttpClient
 from bravado.http_future import FutureAdapter
 from bravado.http_future import HttpFuture
 from bravado_core.response import IncomingResponse
+from bravado_core.schema import is_list_like
 from multidict import MultiDict
 
 log = logging.getLogger(__name__)
@@ -117,7 +118,8 @@ class AsyncioClient(HttpClient):
         if isinstance(orig_data, Mapping):
             data = FormData()
             for name, value in orig_data.items():
-                data.add_field(name, str(value))
+                str_value = str(value) if not is_list_like(value) else [str(v) for v in value]
+                data.add_field(name, str_value)
         else:
             data = orig_data
 
@@ -157,10 +159,8 @@ class AsyncioClient(HttpClient):
 
         items = []
         for key, value in params.items():
-            if isinstance(value, list):
-                items.extend((key, str(item)) for item in value)
-            else:
-                items.append((key, str(value)))
+            entries = [(key, str(value))] if not is_list_like(value) else [(key, str(v)) for v in value]
+            items.extend(entries)
         return MultiDict(items)
 
 
