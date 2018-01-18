@@ -31,7 +31,7 @@ def swagger_client(integration_server, request):
 def test_get_query_args(swagger_client):
     result, response = swagger_client.user.loginUser(
         username='asyncio',
-        password='password',
+        password='p%s&wörd?',
         invalidate_sessions=True,
     ).result(timeout=1)
 
@@ -79,7 +79,7 @@ def test_post_form_data(swagger_client):
         name='Vivi',
         status='sold',
         userId=42,
-        photoUrls=('http://first.url', 'http://second.url'),
+        photoUrls=('http://first.url?param1=value1&param2=ß%$', 'http://second.url'),
     ).result(timeout=1)
     assert result is None
 
