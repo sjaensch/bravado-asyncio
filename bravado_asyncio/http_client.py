@@ -135,12 +135,22 @@ class AsyncioClient(HttpClient):
                 data.add_field(name, stream_obj, filename=file_tuple[0])
 
         params = self.prepare_params(request_params.get('params'))
+
+        connect_timeout = request_params.get('connect_timeout')
+        if connect_timeout:
+            log.warning(
+                'bravado-asyncio does not support setting a connect_timeout '
+                '(you passed a value of {})'.format(connect_timeout),
+            )
+        timeout = request_params.get('timeout')
+
         coroutine = client_session.request(
             method=request_params.get('method') or 'GET',
             url=request_params.get('url'),
             params=params,
             data=data,
             headers=request_params.get('headers'),
+            timeout=timeout,
         )
 
         future = asyncio.run_coroutine_threadsafe(coroutine, get_loop())
@@ -172,9 +182,9 @@ class AsyncioFutureAdapter(FutureAdapter):
         self.future = future
 
     def result(self, timeout: Optional[float]=None) -> AsyncioResponse:
-        start = time.time()
+        start = time.monotonic()
         response = self.future.result(timeout)
-        time_elapsed = time.time() - start
+        time_elapsed = time.monotonic() - start
         remaining_timeout = timeout - time_elapsed if timeout else None
 
         return AsyncioResponse(response=response, remaining_timeout=remaining_timeout)
