@@ -30,5 +30,6 @@ setup(
     extras_require={
         # as recommended by aiohttp, see http://aiohttp.readthedocs.io/en/stable/#library-installation
         'aiohttp_extras': ['aiodns', 'cchardet'],
+        'aiobravado': ['aiobravado'],
     },
 )
