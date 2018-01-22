@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.3.4 (2018-01-22)
+------------------
+- Add support for setting a timeout through request_options - PR #6
+
 0.3.3 (2018-01-04)
 ------------------
 - Support ``collectionFormat: multi`` for array formData params as well - PR #4
