@@ -155,10 +155,16 @@ def test_server_500(swagger_client):
         swagger_client.pet.deletePet(petId=42).result(timeout=1)
 
 
-def test_timeout(swagger_client):
+def test_timeout_on_future(swagger_client):
     with pytest.raises(BravadoTimeoutError):
         bravado_future = swagger_client.store.getInventory()
         bravado_future.result(timeout=0.1)
+
+
+def test_timeout_request_options(swagger_client):
+    with pytest.raises(BravadoTimeoutError):
+        bravado_future = swagger_client.store.getInventory(_request_options={'timeout': 0.1})
+        bravado_future.result(timeout=None)
 
 
 def test_client_from_asyncio(integration_server):
