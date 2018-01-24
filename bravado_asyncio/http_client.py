@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from collections import Mapping
-from typing import Optional
+from typing import Optional  # noqa
 
 import aiohttp
 from aiohttp.formdata import FormData
@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 
 
 # module variable holding the current ClientSession, so that we can share it between AsyncioClient instances
-client_session: Optional[aiohttp.ClientSession] = None
+client_session = None  # type: Optional[aiohttp.ClientSession]
 
 
 def get_client_session(loop: asyncio.AbstractEventLoop) -> aiohttp.ClientSession:
