@@ -21,11 +21,19 @@ from .thread_loop import get_thread_loop
 log = logging.getLogger(__name__)
 
 
-# module variable holding the current ClientSession, so that we can share it between AsyncioClient instances
+#: module variable holding the current :class:`aiohttp.ClientSession`, so that we can share it between
+#: :class:`AsyncioClient` instances. Use :func:`get_client_session` to retrieve it and create one if none
+#: is present.
 client_session = None  # type: Optional[aiohttp.ClientSession]
 
 
 def get_client_session(loop: asyncio.AbstractEventLoop) -> aiohttp.ClientSession:
+    """Get a shared ClientSession object that can be reused. If none exists yet it will
+    create one using the passed-in loop.
+
+    :param loop: an active (i.e. not closed) asyncio event loop
+    :return: a ClientSession instance that can be used to do HTTP requests
+    """
     global client_session
     if client_session:
         return client_session
@@ -40,6 +48,12 @@ class AsyncioClient(HttpClient):
     """
 
     def __init__(self, run_mode: RunMode=RunMode.THREAD, loop: asyncio.AbstractEventLoop=None):
+        """Instantiate a client using the given run_mode. If you do not pass in an event loop, then
+        either a shared loop in a separate thread (THREAD mode) or the default asyncio
+        event loop (FULL_ASYNCIO mode) will be used.
+        Not passing in an event loop will make sure we share the :py:class:`aiohttp.ClientSession` object
+        between AsyncioClient instances.
+        """
         self.run_mode = run_mode
         if self.run_mode == RunMode.THREAD:
             self.loop = loop or get_thread_loop()

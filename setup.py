@@ -3,10 +3,12 @@ import os
 
 from setuptools import setup
 
+import bravado_asyncio
+
 
 setup(
     name='bravado-asyncio',
-    version='0.3.4',
+    version=bravado_asyncio.version,
     license='BSD 3-Clause License',
     description='asyncio powered HTTP client for bravado',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
@@ -15,7 +17,7 @@ setup(
     url='https://github.com/sjaensch/bravado-asyncio',
     packages=['bravado_asyncio'],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'License :: OSI Approved :: BSD License',
