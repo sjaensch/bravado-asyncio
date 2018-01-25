@@ -10,12 +10,6 @@ from bravado_asyncio.http_client import RunMode
 from bravado_asyncio.response_adapter import AioHTTPResponseAdapter
 
 
-@pytest.fixture(autouse=True)
-def mock_ensure_future():
-    with mock.patch('asyncio.ensure_future') as mocked_ensure_future:
-        yield mocked_ensure_future
-
-
 @pytest.fixture
 def mock_client_session():
     with mock.patch('aiohttp.ClientSession') as _mock:
@@ -30,12 +24,23 @@ def asyncio_client(request, mock_client_session):
 
 
 @pytest.fixture
+def mock_log():
+    with mock.patch('bravado_asyncio.http_client.log') as _mock:
+        yield _mock
+
+
+@pytest.fixture
 def request_params():
     return {
         'method': 'GET',
         'url': 'http://swagger.py/client-test',
         'headers': {},
     }
+
+
+def test_fail_on_unknown_run_mode():
+    with pytest.raises(ValueError):
+        AsyncioClient(run_mode='unknown/invalid')
 
 
 def test_request(asyncio_client, mock_client_session, request_params):
@@ -151,3 +156,13 @@ def test_file_data_int_filename(asyncio_client, mock_client_session, request_par
     assert field_data[0]['name'] == 'picture'
     assert field_data[0]['filename'] == 'filename'
     assert field_data[2] == FileObj.read.return_value
+
+
+def test_connect_timeout_logs_warning(asyncio_client, mock_client_session, request_params, mock_log):
+    request_params['connect_timeout'] = 0.1
+
+    asyncio_client.request(request_params)
+
+    assert mock_log.warning.call_count == 1
+    assert 'connect_timeout' in mock_log.warning.call_args[0][0]
+    assert mock_client_session.return_value.request.call_args[1]['timeout'] is None
