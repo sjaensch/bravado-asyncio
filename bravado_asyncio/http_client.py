@@ -1,102 +1,86 @@
 import asyncio
-import concurrent.futures
 import logging
-import threading
-import time
 from collections import Mapping
-from typing import NamedTuple
-from typing import Optional
+from typing import Optional  # noqa
 
 import aiohttp
 from aiohttp.formdata import FormData
 from bravado.http_client import HttpClient
-from bravado.http_future import FutureAdapter
 from bravado.http_future import HttpFuture
-from bravado_core.response import IncomingResponse
 from bravado_core.schema import is_list_like
 from multidict import MultiDict
+
+from bravado_asyncio.definitions import RunMode
+from bravado_asyncio.future_adapter import AsyncioFutureAdapter
+from bravado_asyncio.future_adapter import FutureAdapter
+from bravado_asyncio.response_adapter import AioHTTPResponseAdapter
+from bravado_asyncio.response_adapter import AsyncioHTTPResponseAdapter
+from bravado_asyncio.thread_loop import get_thread_loop
+
 
 log = logging.getLogger(__name__)
 
 
-AsyncioResponse = NamedTuple(
-    'AsyncioResponse', [
-        ('response', aiohttp.ClientResponse),
-        ('remaining_timeout', Optional[float])
-    ]
-)
+#: module variable holding the current :class:`aiohttp.ClientSession`, so that we can share it between
+#: :class:`AsyncioClient` instances. Use :func:`get_client_session` to retrieve it and create one if none
+#: is present.
+client_session = None  # type: Optional[aiohttp.ClientSession]
 
 
-loop = None
-client_session = None
+def get_client_session(loop: asyncio.AbstractEventLoop) -> aiohttp.ClientSession:
+    """Get a shared ClientSession object that can be reused. If none exists yet it will
+    create one using the passed-in loop.
 
-
-def run_event_loop(loop):
-    asyncio.set_event_loop(loop)
-    loop.run_forever()
-
-
-def get_loop():
-    global loop
-    if loop is None:
-        loop = asyncio.new_event_loop()
-        thread = threading.Thread(target=run_event_loop, args=(loop,), daemon=True)
-        thread.start()
-    return loop
-
-
-def get_client_session():
+    :param loop: an active (i.e. not closed) asyncio event loop
+    :return: a ClientSession instance that can be used to do HTTP requests
+    """
     global client_session
     if client_session:
         return client_session
-    client_session = aiohttp.ClientSession(loop=get_loop())
+    client_session = aiohttp.ClientSession(loop=loop)
     return client_session
 
 
-class AioHTTPResponseAdapter(IncomingResponse):
-    """Wraps a aiohttp Response object to provide a bravado-like interface
-    to the response innards.
-    """
-
-    def __init__(self, response: AsyncioResponse):
-        self._delegate = response.response
-        self._remaining_timeout = response.remaining_timeout
-
-    @property
-    def status_code(self):
-        return self._delegate.status
-
-    @property
-    def text(self):
-        future = asyncio.run_coroutine_threadsafe(self._delegate.text(), get_loop())
-        return future.result(self._remaining_timeout)
-
-    @property
-    def raw_bytes(self):
-        future = asyncio.run_coroutine_threadsafe(self._delegate.read(), get_loop())
-        return future.result(self._remaining_timeout)
-
-    @property
-    def reason(self):
-        return self._delegate.reason
-
-    @property
-    def headers(self):
-        return self._delegate.headers
-
-    def json(self, **_):
-        future = asyncio.run_coroutine_threadsafe(self._delegate.json(), get_loop())
-        return future.result(self._remaining_timeout)
-
-
 class AsyncioClient(HttpClient):
-    """Asynchronous HTTP client using the asyncio event loop.
+    """Asynchronous HTTP client using the asyncio event loop. Can either use an event loop
+    in a separate thread or operate fully asynchronous within the current thread, using
+    async / await.
     """
+
+    def __init__(self, run_mode: RunMode=RunMode.THREAD, loop: Optional[asyncio.AbstractEventLoop]=None):
+        """Instantiate a client using the given run_mode. If you do not pass in an event loop, then
+        either a shared loop in a separate thread (THREAD mode) or the default asyncio
+        event loop (FULL_ASYNCIO mode) will be used.
+        Not passing in an event loop will make sure we share the :py:class:`aiohttp.ClientSession` object
+        between AsyncioClient instances.
+        """
+        self.run_mode = run_mode
+        if self.run_mode == RunMode.THREAD:
+            self.loop = loop or get_thread_loop()
+            self.run_coroutine_func = asyncio.run_coroutine_threadsafe
+            self.response_adapter = AioHTTPResponseAdapter
+            self.bravado_future_class = HttpFuture
+            self.future_adapter = FutureAdapter
+        elif run_mode == RunMode.FULL_ASYNCIO:
+            from aiobravado.http_future import HttpFuture as AsyncioHttpFuture
+
+            self.loop = loop or asyncio.get_event_loop()
+            self.run_coroutine_func = asyncio.ensure_future
+            self.response_adapter = AsyncioHTTPResponseAdapter
+            self.bravado_future_class = AsyncioHttpFuture
+            self.future_adapter = AsyncioFutureAdapter
+        else:
+            raise ValueError('Don\'t know how to handle run mode {}'.format(str(run_mode)))
+
+        # don't use the shared client_session if we've been passed an explicit loop argument
+        if loop:
+            self.client_session = aiohttp.ClientSession(loop=loop)
+        else:
+            self.client_session = get_client_session(self.loop)
 
     def request(self, request_params, operation=None, response_callbacks=None,
                 also_return_response=False):
-        """Sets up the request params as per Twisted Agent needs.
-        Sets up crochet and triggers the API request in background
+        """Sets up the request params for aiohttp and executes the request in the background.
 
         :param request_params: request parameters for the http request.
         :type request_params: dict
@@ -111,8 +95,6 @@ class AsyncioClient(HttpClient):
 
         :rtype: :class: `bravado_core.http_future.HttpFuture`
         """
-
-        client_session = get_client_session()
 
         orig_data = request_params.get('data', {})
         if isinstance(orig_data, Mapping):
@@ -144,7 +126,7 @@ class AsyncioClient(HttpClient):
             )
         timeout = request_params.get('timeout')
 
-        coroutine = client_session.request(
+        coroutine = self.client_session.request(
             method=request_params.get('method') or 'GET',
             url=request_params.get('url'),
             params=params,
@@ -153,11 +135,11 @@ class AsyncioClient(HttpClient):
             timeout=timeout,
         )
 
-        future = asyncio.run_coroutine_threadsafe(coroutine, get_loop())
+        future = self.run_coroutine_func(coroutine, loop=self.loop)
 
-        return HttpFuture(
-            AsyncioFutureAdapter(future),
-            AioHTTPResponseAdapter,
+        return self.bravado_future_class(
+            self.future_adapter(future),
+            self.response_adapter(loop=self.loop),
             operation,
             response_callbacks,
             also_return_response,
@@ -172,19 +154,3 @@ class AsyncioClient(HttpClient):
             entries = [(key, str(value))] if not is_list_like(value) else [(key, str(v)) for v in value]
             items.extend(entries)
         return MultiDict(items)
-
-
-class AsyncioFutureAdapter(FutureAdapter):
-
-    timeout_errors = (concurrent.futures.TimeoutError,)
-
-    def __init__(self, future: concurrent.futures.Future) -> None:
-        self.future = future
-
-    def result(self, timeout: Optional[float]=None) -> AsyncioResponse:
-        start = time.monotonic()
-        response = self.future.result(timeout)
-        time_elapsed = time.monotonic() - start
-        remaining_timeout = timeout - time_elapsed if timeout else None
-
-        return AsyncioResponse(response=response, remaining_timeout=remaining_timeout)

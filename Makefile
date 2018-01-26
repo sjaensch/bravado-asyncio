@@ -9,6 +9,10 @@ devenv: venv setup.py requirements-dev.txt
 test: devenv
 	venv/bin/tox
 
+.PHONY: docs
+docs: devenv
+	venv/bin/tox -e docs
+
 venv:
 	virtualenv -p python3.6 venv
 
