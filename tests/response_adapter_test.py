@@ -9,11 +9,6 @@ from bravado_asyncio.response_adapter import AioHTTPResponseAdapter
 from bravado_asyncio.response_adapter import AsyncioHTTPResponseAdapter
 
 
-@pytest.fixture
-def mock_loop():
-    return mock.Mock(name='loop')
-
-
 @pytest.fixture(params=(AioHTTPResponseAdapter, AsyncioHTTPResponseAdapter))
 def response_adapter(request, mock_loop):
     return request.param(mock_loop)

@@ -3,7 +3,7 @@ from typing import TypeVar
 
 from bravado_core.response import IncomingResponse
 
-from .definitions import AsyncioResponse
+from bravado_asyncio.definitions import AsyncioResponse
 
 
 T = TypeVar('T')

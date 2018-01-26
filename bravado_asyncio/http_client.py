@@ -10,12 +10,12 @@ from bravado.http_future import HttpFuture
 from bravado_core.schema import is_list_like
 from multidict import MultiDict
 
-from .definitions import RunMode
-from .future_adapter import AsyncioFutureAdapter
-from .future_adapter import FutureAdapter
-from .response_adapter import AioHTTPResponseAdapter
-from .response_adapter import AsyncioHTTPResponseAdapter
-from .thread_loop import get_thread_loop
+from bravado_asyncio.definitions import RunMode
+from bravado_asyncio.future_adapter import AsyncioFutureAdapter
+from bravado_asyncio.future_adapter import FutureAdapter
+from bravado_asyncio.response_adapter import AioHTTPResponseAdapter
+from bravado_asyncio.response_adapter import AsyncioHTTPResponseAdapter
+from bravado_asyncio.thread_loop import get_thread_loop
 
 
 log = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ class AsyncioClient(HttpClient):
     async / await.
     """
 
-    def __init__(self, run_mode: RunMode=RunMode.THREAD, loop: asyncio.AbstractEventLoop=None):
+    def __init__(self, run_mode: RunMode=RunMode.THREAD, loop: Optional[asyncio.AbstractEventLoop]=None):
         """Instantiate a client using the given run_mode. If you do not pass in an event loop, then
         either a shared loop in a separate thread (THREAD mode) or the default asyncio
         event loop (FULL_ASYNCIO mode) will be used.

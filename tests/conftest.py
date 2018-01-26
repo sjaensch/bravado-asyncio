@@ -1,5 +1,6 @@
 import asyncio
 
+import mock
 import pytest
 
 
@@ -9,3 +10,8 @@ def event_loop():
     yield loop
     loop.stop()
     loop.close()
+
+
+@pytest.fixture
+def mock_loop():
+    return mock.Mock(name='loop')

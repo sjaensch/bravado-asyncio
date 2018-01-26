@@ -25,14 +25,6 @@ def mock_wait_for():
         yield _mock
 
 
-@pytest.fixture
-def event_loop():
-    loop = asyncio.new_event_loop()
-    yield loop
-    loop.stop()
-    loop.close()
-
-
 def test_future_adapter(mock_future, mock_response):
     mock_future.result.return_value = mock_response
 

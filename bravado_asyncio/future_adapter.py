@@ -5,7 +5,7 @@ from typing import Optional
 
 from bravado.http_future import FutureAdapter as BaseFutureAdapter
 
-from .definitions import AsyncioResponse
+from bravado_asyncio.definitions import AsyncioResponse
 
 
 class FutureAdapter(BaseFutureAdapter):
