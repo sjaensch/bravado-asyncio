@@ -18,6 +18,6 @@ venv:
 
 .PHONY: clean
 clean:
-	find -name '__pycache__' -delete
+	find . -name '__pycache__' -delete
 	rm -rf .tox
 	rm -rf venv

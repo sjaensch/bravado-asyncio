@@ -1,4 +1,6 @@
 import asyncio
+from typing import Any
+from typing import Dict
 from typing import TypeVar
 
 from bravado_core.response import IncomingResponse
@@ -22,28 +24,28 @@ class AioHTTPResponseAdapter(IncomingResponse):
         return self
 
     @property
-    def status_code(self):
+    def status_code(self) -> int:
         return self._delegate.status
 
     @property
-    def text(self):
+    def text(self) -> str:
         future = asyncio.run_coroutine_threadsafe(self._delegate.text(), self._loop)
         return future.result(self._remaining_timeout)
 
     @property
-    def raw_bytes(self):
+    def raw_bytes(self) -> bytes:
         future = asyncio.run_coroutine_threadsafe(self._delegate.read(), self._loop)
         return future.result(self._remaining_timeout)
 
     @property
-    def reason(self):
+    def reason(self) -> str:
         return self._delegate.reason
 
     @property
-    def headers(self):
+    def headers(self) -> Dict[str, str]:
         return self._delegate.headers
 
-    def json(self, **_):
+    def json(self, **_: Any) -> Dict[str, Any]:
         future = asyncio.run_coroutine_threadsafe(self._delegate.json(), self._loop)
         return future.result(self._remaining_timeout)
 
@@ -53,12 +55,12 @@ class AsyncioHTTPResponseAdapter(AioHTTPResponseAdapter):
     Methods are coroutines if they call coroutines themselves and need to be awaited."""
 
     @property
-    async def text(self):
+    async def text(self) -> str:  # type: ignore
         return await asyncio.wait_for(self._delegate.text(), timeout=self._remaining_timeout, loop=self._loop)
 
     @property
-    async def raw_bytes(self):
+    async def raw_bytes(self) -> bytes:  # type: ignore
         return await asyncio.wait_for(self._delegate.read(), timeout=self._remaining_timeout, loop=self._loop)
 
-    async def json(self, **_):
+    async def json(self, **_: Any) -> Dict[str, Any]:  # type: ignore
         return await asyncio.wait_for(self._delegate.json(), timeout=self._remaining_timeout, loop=self._loop)

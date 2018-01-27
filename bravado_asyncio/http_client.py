@@ -1,12 +1,18 @@
 import asyncio
 import logging
 from collections import Mapping
-from typing import Optional  # noqa
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Optional
 
 import aiohttp
 from aiohttp.formdata import FormData
+from bravado import http_future  # noqa
 from bravado.http_client import HttpClient
 from bravado.http_future import HttpFuture
+from bravado_core.operation import Operation
+from bravado_core.response import IncomingResponse
 from bravado_core.schema import is_list_like
 from multidict import MultiDict
 
@@ -47,7 +53,7 @@ class AsyncioClient(HttpClient):
     async / await.
     """
 
-    def __init__(self, run_mode: RunMode=RunMode.THREAD, loop: Optional[asyncio.AbstractEventLoop]=None):
+    def __init__(self, run_mode: RunMode=RunMode.THREAD, loop: Optional[asyncio.AbstractEventLoop]=None) -> None:
         """Instantiate a client using the given run_mode. If you do not pass in an event loop, then
         either a shared loop in a separate thread (THREAD mode) or the default asyncio
         event loop (FULL_ASYNCIO mode) will be used.
@@ -57,10 +63,10 @@ class AsyncioClient(HttpClient):
         self.run_mode = run_mode
         if self.run_mode == RunMode.THREAD:
             self.loop = loop or get_thread_loop()
-            self.run_coroutine_func = asyncio.run_coroutine_threadsafe
+            self.run_coroutine_func = asyncio.run_coroutine_threadsafe  # type: Callable
             self.response_adapter = AioHTTPResponseAdapter
             self.bravado_future_class = HttpFuture
-            self.future_adapter = FutureAdapter
+            self.future_adapter = FutureAdapter  # type: http_future.FutureAdapter
         elif run_mode == RunMode.FULL_ASYNCIO:
             from aiobravado.http_future import HttpFuture as AsyncioHttpFuture
 
@@ -78,16 +84,19 @@ class AsyncioClient(HttpClient):
         else:
             self.client_session = get_client_session(self.loop)
 
-    def request(self, request_params, operation=None, response_callbacks=None,
-                also_return_response=False):
+    def request(
+            self,
+            request_params: Dict[str, Any],
+            operation: Optional[Operation]=None,
+            response_callbacks: Optional[Callable[[IncomingResponse, Operation], None]]=None,
+            also_return_response: bool=False,
+    ) -> HttpFuture:
         """Sets up the request params for aiohttp and executes the request in the background.
 
         :param request_params: request parameters for the http request.
-        :type request_params: dict
         :param operation: operation that this http request is for. Defaults
             to None - in which case, we're obviously just retrieving a Swagger
             Spec.
-        :type operation: :class:`bravado_core.operation.Operation`
         :param response_callbacks: List of callables to post-process the
             incoming response. Expects args incoming_response and operation.
         :param also_return_response: Consult the constructor documentation for
@@ -150,7 +159,7 @@ class AsyncioClient(HttpClient):
             also_return_response,
         )
 
-    def prepare_params(self, params):
+    def prepare_params(self, params: Optional[Dict[str, Any]]) -> MultiDict:
         if not params:
             return params
 
