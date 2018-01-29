@@ -7,5 +7,5 @@ Known issues
   with both Python 3.5 and Python 3.6.
 - Due to the fact that network requests are done in non-blocking mode, a connect timeout cannot be specified. The
   corresponding parameter in request_options has no effect.
-- The AsyncioClient does not support the ``set_basic_auth`` and ``set_api_key methods`` that the RequestsClient has.
+- The AsyncioClient does not support the ``set_basic_auth`` and ``set_api_key`` methods that the RequestsClient has.
   As a workaround, you can specify the necessary headers manually as part of the request options.
