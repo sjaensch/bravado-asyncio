@@ -1,7 +1,6 @@
 import asyncio
 import io
 import os.path
-import sys
 import time
 
 import pytest
@@ -162,10 +161,7 @@ def test_timeout_on_future(swagger_client):
         bravado_future.result(timeout=0.1)
 
 
-@pytest.mark.xfail(
-    sys.version_info.major == 3 and sys.version_info.minor == 5,
-    reason='Timeout exception is not raised reliably for AsyncioClient under Python 3.5',
-)
+@pytest.mark.xfail(reason='Timeout exception is not raised reliably for AsyncioClient')
 def test_timeout_request_options(swagger_client):
     with pytest.raises(BravadoTimeoutError):
         bravado_future = swagger_client.store.getInventory(_request_options={'timeout': 0.1})
