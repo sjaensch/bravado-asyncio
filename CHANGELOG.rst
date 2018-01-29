@@ -1,6 +1,12 @@
 Changelog
 =========
 
+0.4.0 (2018-01-29)
+------------------
+- Add support for full asyncio run mode, to be used by the aiobravado library - PR #7
+- Created documentation; find it at https://bravado-asyncio.readthedocs.io/en/latest/ - PR #7
+- Document known issues, disable flaky request options timeout test PR #8, #10
+
 0.3.4 (2018-01-22)
 ------------------
 - Add support for setting a timeout through request_options - PR #6
