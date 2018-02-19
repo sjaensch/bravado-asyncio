@@ -126,12 +126,17 @@ class AsyncioClient(HttpClient):
             )
         timeout = request_params.get('timeout')
 
+        # aiohttp always adds a Content-Type header, and this breaks some servers that don't
+        # expect it for non-POST/PUT requests: https://github.com/aio-libs/aiohttp/issues/457
+        skip_auto_headers = ['Content-Type'] if request_params.get('method') not in ['POST', 'PUT'] else None
+
         coroutine = self.client_session.request(
             method=request_params.get('method') or 'GET',
             url=request_params.get('url'),
             params=params,
             data=data,
             headers=request_params.get('headers'),
+            skip_auto_headers=skip_auto_headers,
             timeout=timeout,
         )
 

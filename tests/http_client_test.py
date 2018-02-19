@@ -58,6 +58,7 @@ def test_request(asyncio_client, mock_client_session, request_params):
         params=None,
         data=mock.ANY,
         headers={},
+        skip_auto_headers=['Content-Type'],
         timeout=None,
     )
     assert mock_client_session.return_value.request.call_args[1]['data']._fields == []
@@ -87,6 +88,7 @@ def test_simple_get(asyncio_client, mock_client_session, request_params):
         params=request_params['params'],
         data=mock.ANY,
         headers={},
+        skip_auto_headers=['Content-Type'],
         timeout=None,
     )
     assert mock_client_session.return_value.request.call_args[1]['data']._fields == []
@@ -119,6 +121,7 @@ def test_formdata(asyncio_client, mock_client_session, request_params, param_nam
         params=None,
         data=mock.ANY,
         headers={},
+        skip_auto_headers=['Content-Type'],
         timeout=None,
     )
 
