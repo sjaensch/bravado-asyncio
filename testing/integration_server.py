@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import os.path
+import sys
 
 import umsgpack
 from aiohttp import web
@@ -32,6 +33,8 @@ async def login(request):
 
 
 async def get_pet(request):
+    check_content_type(request.headers, expected_content_type=None)
+
     pet_id = request.match_info['petId']
     if pet_id == '5':
         return web.HTTPNotFound()
@@ -58,6 +61,8 @@ async def search_pets(request):
 
 
 async def update_pet_formdata(request):
+    check_content_type(request.headers, expected_content_type='application/x-www-form-urlencoded')
+
     post_data = await request.post()
     if not (
         request.match_info['petId'] == '12'
@@ -72,6 +77,8 @@ async def update_pet_formdata(request):
 
 
 async def upload_pet_image(request):
+    check_content_type(request.headers, expected_content_type='multipart/form-data')
+
     with open(os.path.join(os.path.dirname(__file__), 'sample.jpg'), 'rb') as f:
         data = await request.post()
         file_data = data.get('file')
@@ -91,6 +98,8 @@ async def upload_pet_image(request):
 
 
 async def update_pet(request):
+    check_content_type(request.headers, expected_content_type='application/json')
+
     body = await request.json()
     success = body == {
         'id': 42,
@@ -109,6 +118,8 @@ async def update_pet(request):
 
 
 async def delete_pet(request):
+    check_content_type(request.headers, expected_content_type=None)
+
     if request.query.get('petId') == '42':
         return web.HTTPInternalServerError()
 
@@ -132,6 +143,14 @@ async def get_pets(request):
         },
     ]
     return web.json_response(pets)
+
+
+def check_content_type(headers, expected_content_type):
+    content_type = headers.get('Content-Type')
+    if content_type != expected_content_type:
+        if not (isinstance(expected_content_type, str) and str(content_type).startswith(expected_content_type)):
+            print('Invalid content type {}'.format(content_type), file=sys.stderr)
+            raise web.HTTPBadRequest()
 
 
 def setup_routes(app):
