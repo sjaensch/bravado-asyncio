@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.4.1 (2018-02-19)
+------------------
+- Only set Content-Type header if the request method is PUT or POST - PR #11
+
 0.4.0 (2018-01-29)
 ------------------
 - Add support for full asyncio run mode, to be used by the aiobravado library - PR #7
