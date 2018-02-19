@@ -4,6 +4,7 @@ from typing import Dict
 from typing import TypeVar
 
 from bravado_core.response import IncomingResponse
+from multidict import CIMultiDict
 
 from bravado_asyncio.definitions import AsyncioResponse
 
@@ -42,7 +43,7 @@ class AioHTTPResponseAdapter(IncomingResponse):
         return self._delegate.reason
 
     @property
-    def headers(self) -> Dict[str, str]:
+    def headers(self) -> CIMultiDict:
         return self._delegate.headers
 
     def json(self, **_: Any) -> Dict[str, Any]:
