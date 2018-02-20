@@ -13,9 +13,9 @@ def wait_unit_service_starts(url, timeout=10):
     while time.time() < start + timeout:
         try:
             urllib.request.urlopen(url, timeout=2)
-        except urllib.error.HTTPError:
+        except urllib.error.HTTPError:  # pragma: no cover
             return
-        except urllib.error.URLError:
+        except urllib.error.URLError:  # pragma: no cover
             time.sleep(0.1)
 
 
