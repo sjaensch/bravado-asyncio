@@ -29,7 +29,8 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     install_requires=[
-        'aiohttp',
+        'aiohttp ;python_full_version>="3.5.3"',  # aiohttp 3.0 requires at least Python 3.5.3
+        'aiohttp<3.0 ;python_full_version<"3.5.3"',
         'bravado',
     ],
     extras_require={
