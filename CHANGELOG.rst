@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.4.2 (2018-03-07)
+------------------
+- Fix installation of bravado-asyncio with Python versions below 3.5.3 - PR #12, #13, #14
+
 0.4.1 (2018-02-19)
 ------------------
 - Only set Content-Type header if the request method is PUT or POST - PR #11
