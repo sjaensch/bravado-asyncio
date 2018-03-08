@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import sys
 
 from setuptools import setup
 
@@ -8,6 +9,8 @@ base_dir = os.path.dirname(__file__)
 about = {}
 with open(os.path.join(base_dir, 'bravado_asyncio', '__init__.py')) as f:
     exec(f.read(), about)
+
+aiohttp_requirement = 'aiohttp' if sys.version_info >= (3, 5, 3) else 'aiohttp<3.0'
 
 setup(
     name='bravado-asyncio',
@@ -29,8 +32,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     install_requires=[
-        'aiohttp ;python_full_version>="3.5.3"',  # aiohttp 3.0 requires at least Python 3.5.3
-        'aiohttp<3.0 ;python_full_version<"3.5.3"',
+        aiohttp_requirement,
         'bravado',
     ],
     extras_require={
