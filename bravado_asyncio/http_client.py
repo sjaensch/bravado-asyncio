@@ -5,6 +5,7 @@ from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Optional
+from typing import Union
 
 import aiohttp
 from aiohttp.formdata import FormData
@@ -159,7 +160,7 @@ class AsyncioClient(HttpClient):
             also_return_response,
         )
 
-    def prepare_params(self, params: Optional[Dict[str, Any]]) -> MultiDict:
+    def prepare_params(self, params: Optional[Dict[str, Any]]) -> Union[Optional[Dict[str, Any]], MultiDict]:
         if not params:
             return params
 
