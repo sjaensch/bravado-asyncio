@@ -168,6 +168,7 @@ def test_timeout_request_options(swagger_client):
         bravado_future.result(timeout=None)
 
 
+@pytest.mark.xfail(reason='Execution time is not always below 2 seconds especially for Python 3.5')
 def test_client_from_asyncio(integration_server):
     """Let's make sure that the event loop for our HTTP client that runs in a different thread
     behaves properly with the 'standard' asyncio loop that people would normally use when doing
