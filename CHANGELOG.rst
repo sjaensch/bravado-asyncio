@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.0.0 (2018-05-28)
+------------------
+- bravado-asyncio has worked reliably internally, let's release it as 1.0.
+
 0.4.3 (2018-03-08)
 ------------------
 - One more try at fixing the remaining installation issues on Python < 3.5.3 - PR #15
