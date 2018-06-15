@@ -30,7 +30,7 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     install_requires=[
-        'bravado',
+        'bravado>=10.0.0',
     ],
     extras_require={
         # as recommended by aiohttp, see http://aiohttp.readthedocs.io/en/stable/#library-installation
