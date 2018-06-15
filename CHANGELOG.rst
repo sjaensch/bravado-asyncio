@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.1.0 (2018-06-15)
+------------------
+- Adapt to the new RequestConfig interface introduced by bravado. Requires at least bravado 10.0.0.
+
 1.0.0 (2018-05-28)
 ------------------
 - bravado-asyncio has worked reliably internally, let's release it as 1.0.
