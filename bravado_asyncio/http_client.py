@@ -2,7 +2,7 @@ import asyncio
 import logging
 from collections import Mapping
 from typing import Any
-from typing import Callable
+from typing import Callable  # noqa: F401
 from typing import Dict
 from typing import Optional
 from typing import Union
@@ -10,10 +10,10 @@ from typing import Union
 import aiohttp
 from aiohttp.formdata import FormData
 from bravado import http_future  # noqa
+from bravado.config import RequestConfig
 from bravado.http_client import HttpClient
 from bravado.http_future import HttpFuture
 from bravado_core.operation import Operation
-from bravado_core.response import IncomingResponse
 from bravado_core.schema import is_list_like
 from multidict import MultiDict
 
@@ -89,8 +89,7 @@ class AsyncioClient(HttpClient):
             self,
             request_params: Dict[str, Any],
             operation: Optional[Operation]=None,
-            response_callbacks: Optional[Callable[[IncomingResponse, Operation], None]]=None,
-            also_return_response: bool=False,
+            request_config: Optional[RequestConfig]=None,
     ) -> HttpFuture:
         """Sets up the request params for aiohttp and executes the request in the background.
 
@@ -98,9 +97,7 @@ class AsyncioClient(HttpClient):
         :param operation: operation that this http request is for. Defaults
             to None - in which case, we're obviously just retrieving a Swagger
             Spec.
-        :param response_callbacks: List of callables to post-process the
-            incoming response. Expects args incoming_response and operation.
-        :param also_return_response: Consult the constructor documentation for
+        :param request_config:RequestConfig request_config: Per-request config that is passed to
             :class:`bravado.http_future.HttpFuture`.
 
         :rtype: :class: `bravado_core.http_future.HttpFuture`
@@ -156,8 +153,7 @@ class AsyncioClient(HttpClient):
             self.future_adapter(future),
             self.response_adapter(loop=self.loop),
             operation,
-            response_callbacks,
-            also_return_response,
+            request_config=request_config,
         )
 
     def prepare_params(self, params: Optional[Dict[str, Any]]) -> Union[Optional[Dict[str, Any]], MultiDict]:

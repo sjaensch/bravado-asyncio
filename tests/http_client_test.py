@@ -16,7 +16,7 @@ def mock_client_session():
         yield _mock
 
 
-@pytest.fixture(params=RunMode)
+@pytest.fixture(params=[RunMode.THREAD])
 def asyncio_client(request, mock_client_session):
     client = AsyncioClient(run_mode=request.param, loop=mock.Mock(spec=asyncio.AbstractEventLoop))
     client.run_coroutine_func = mock.Mock('run_coroutine_func')
@@ -72,8 +72,7 @@ def test_request(asyncio_client, mock_client_session, request_params):
         asyncio_client.future_adapter.return_value,
         asyncio_client.response_adapter.return_value,
         None,
-        None,
-        False,
+        request_config=None,
     )
 
 
