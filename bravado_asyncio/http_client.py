@@ -142,7 +142,11 @@ class AsyncioClient(HttpClient):
             url=request_params.get('url'),
             params=params,
             data=data,
-            headers=request_params.get('headers'),
+            headers={
+                # Convert not string headers to string
+                k: str(v)
+                for k, v in request_params.get('headers', {}).items()
+            },
             skip_auto_headers=skip_auto_headers,
             timeout=timeout,
         )
