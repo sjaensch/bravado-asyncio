@@ -31,6 +31,7 @@ setup(
     ],
     install_requires=[
         'bravado>=10.0.0',
+        'yelp-bytes',
     ],
     extras_require={
         # as recommended by aiohttp, see http://aiohttp.readthedocs.io/en/stable/#library-installation
