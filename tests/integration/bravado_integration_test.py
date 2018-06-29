@@ -10,7 +10,7 @@ class TestServerBravadoAsyncioClient(IntegrationTestsBaseClass):
     http_client_type = AsyncioClient
     http_future_adapter_type = FutureAdapter
     connection_errors_exceptions = {
-        aiohttp.client_exceptions.ClientError()
+        aiohttp.ClientConnectionError(),
     }
 
     def cancel_http_future(self, http_future):

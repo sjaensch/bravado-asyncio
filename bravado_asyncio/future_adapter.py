@@ -14,7 +14,7 @@ class FutureAdapter(BaseFutureAdapter):
     a normal Python function, and we expect future to be from the concurrent.futures module."""
 
     timeout_errors = (concurrent.futures.TimeoutError,)
-    connection_errors = (aiohttp.client_exceptions.ClientError,)
+    connection_errors = (aiohttp.ClientConnectionError,)
 
     def __init__(self, future: concurrent.futures.Future) -> None:
         self.future = future
@@ -33,7 +33,7 @@ class AsyncioFutureAdapter(BaseFutureAdapter):
     a coroutine, and we expect future to be awaitable."""
 
     timeout_errors = (asyncio.TimeoutError,)
-    connection_errors = (aiohttp.client_exceptions.ClientError,)
+    connection_errors = (aiohttp.ClientConnectionError,)
 
     def __init__(self, future: asyncio.Future) -> None:
         self.future = future
