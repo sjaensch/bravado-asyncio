@@ -16,6 +16,7 @@ from bravado.http_future import HttpFuture
 from bravado_core.operation import Operation
 from bravado_core.schema import is_list_like
 from multidict import MultiDict
+from yelp_bytes import from_bytes
 
 from bravado_asyncio.definitions import RunMode
 from bravado_asyncio.future_adapter import AsyncioFutureAdapter
@@ -144,7 +145,7 @@ class AsyncioClient(HttpClient):
             data=data,
             headers={
                 # Convert not string headers to string
-                k: str(v)
+                k: from_bytes(v) if isinstance(v, bytes) else str(v)
                 for k, v in request_params.get('headers', {}).items()
             },
             skip_auto_headers=skip_auto_headers,
