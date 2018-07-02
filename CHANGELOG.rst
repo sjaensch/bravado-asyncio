@@ -1,9 +1,14 @@
 Changelog
 =========
 
+1.2.0 (2018-07-02)
+------------------
+- Support the new BravadoConnectionError introduced with bravado 10.1.0 - PR #18
+- Convert non-string headers to strings - PR #18
+
 1.1.0 (2018-06-15)
 ------------------
-- Adapt to the new RequestConfig interface introduced by bravado. Requires at least bravado 10.0.0.
+- Adapt to the new RequestConfig interface introduced by bravado. Requires at least bravado 10.0.0 - PR #17
 
 1.0.0 (2018-05-28)
 ------------------
