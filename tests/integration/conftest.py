@@ -25,7 +25,7 @@ def integration_server():
     server_port = ephemeral_port_reserve.reserve()
     server = subprocess.Popen(
         ['python', script_name, '-p', str(server_port)],
-        stdin=None, stdout=subprocess.DEVNULL, stderr=None,
+        stdin=None, stdout=None, stderr=None,
     )
     wait_unit_service_starts('http://localhost:{port}'.format(port=server_port))
 

@@ -22,7 +22,7 @@ async def login(request):
     if not (
         request.query.get('username') == 'asyncio'
         and request.query.get('password') == 'p%s&wörd?'
-        and request.query.get('invalidate_sessions') == 'True'
+        and request.query.get('invalidate_sessions') in ('True', 'true')
     ):
         return web.HTTPBadRequest()
 
