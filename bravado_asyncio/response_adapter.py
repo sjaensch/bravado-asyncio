@@ -40,7 +40,7 @@ class AioHTTPResponseAdapter(IncomingResponse):
 
     @property
     def reason(self) -> str:
-        return self._delegate.reason
+        return self._delegate.reason  # type: ignore  # aiohttp.ClientResponse doesn't annotate this attribute correctly
 
     @property
     def headers(self) -> CIMultiDict:
