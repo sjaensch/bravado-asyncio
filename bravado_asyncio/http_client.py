@@ -3,6 +3,7 @@ import logging
 from collections import Mapping
 from typing import Any
 from typing import Callable  # noqa: F401
+from typing import cast
 from typing import Dict
 from typing import Optional
 from typing import Union
@@ -140,7 +141,7 @@ class AsyncioClient(HttpClient):
 
         coroutine = self.client_session.request(
             method=request_params.get('method') or 'GET',
-            url=request_params.get('url'),
+            url=cast(str, request_params.get('url', '')),
             params=params,
             data=data,
             headers={

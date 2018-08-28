@@ -1,5 +1,6 @@
 import asyncio
 from typing import Any
+from typing import cast
 from typing import Dict
 from typing import TypeVar
 
@@ -40,7 +41,7 @@ class AioHTTPResponseAdapter(IncomingResponse):
 
     @property
     def reason(self) -> str:
-        return self._delegate.reason
+        return cast(str, self._delegate.reason)  # aiohttp 3.4.0 doesn't annotate this attribute correctly
 
     @property
     def headers(self) -> CIMultiDict:
