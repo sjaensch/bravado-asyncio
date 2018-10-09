@@ -16,9 +16,14 @@ def mock_client_session():
         yield _mock
 
 
-@pytest.fixture(params=[RunMode.THREAD])
-def asyncio_client(request, mock_client_session):
-    client = AsyncioClient(run_mode=request.param, loop=mock.Mock(spec=asyncio.AbstractEventLoop))
+@pytest.fixture
+def asyncio_client(mock_client_session, ssl_verify=True, ssl_cert=None):
+    client = AsyncioClient(
+        run_mode=RunMode.THREAD,
+        loop=mock.Mock(spec=asyncio.AbstractEventLoop),
+        ssl_verify=ssl_verify,
+        ssl_cert=ssl_cert,
+    )
     client.run_coroutine_func = mock.Mock('run_coroutine_func')
     return client
 
@@ -36,6 +41,12 @@ def request_params():
         'url': 'http://swagger.py/client-test',
         'headers': {},
     }
+
+
+@pytest.fixture
+def mock_create_default_context():
+    with mock.patch('ssl.create_default_context', autospec=True) as _mock:
+        yield _mock
 
 
 def test_fail_on_unknown_run_mode():
@@ -59,6 +70,7 @@ def test_request(asyncio_client, mock_client_session, request_params):
         data=mock.ANY,
         headers={},
         skip_auto_headers=['Content-Type'],
+        ssl=None,
         timeout=None,
     )
     assert mock_client_session.return_value.request.call_args[1]['data']._fields == []
@@ -88,6 +100,7 @@ def test_simple_get(asyncio_client, mock_client_session, request_params):
         data=mock.ANY,
         headers={},
         skip_auto_headers=['Content-Type'],
+        ssl=None,
         timeout=None,
     )
     assert mock_client_session.return_value.request.call_args[1]['data']._fields == []
@@ -121,6 +134,7 @@ def test_formdata(asyncio_client, mock_client_session, request_params, param_nam
         data=mock.ANY,
         headers={},
         skip_auto_headers=['Content-Type'],
+        ssl=None,
         timeout=None,
     )
 
@@ -168,3 +182,41 @@ def test_connect_timeout_logs_warning(asyncio_client, mock_client_session, reque
     assert mock_log.warning.call_count == 1
     assert 'connect_timeout' in mock_log.warning.call_args[0][0]
     assert mock_client_session.return_value.request.call_args[1]['timeout'] is None
+
+
+def test_disable_ssl_verification(mock_client_session, mock_create_default_context):
+    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify=False)
+    client.request({})
+    assert mock_client_session.return_value.request.call_args[1]['ssl'] is False
+    assert mock_create_default_context.call_count == 0
+
+
+def test_use_custom_ssl_ca(mock_client_session, mock_create_default_context):
+    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify='my_ca_cert')
+    client.request({})
+    assert mock_client_session.return_value.request.call_args[1]['ssl'] == mock_create_default_context.return_value
+    mock_create_default_context.assert_called_once_with(cafile='my_ca_cert')
+    assert mock_create_default_context.return_value.load_cert_chain.call_count == 0
+
+
+@pytest.mark.parametrize(
+    'ssl_cert, expected_args',
+    (
+        ('my_cert', ('my_cert',)),
+        (['my_cert'], ('my_cert',)),
+        (['my_cert', 'my_key'], ('my_cert', 'my_key')),
+    ),
+)
+def test_use_custom_ssl_cert(ssl_cert, expected_args, mock_client_session, mock_create_default_context):
+    client = asyncio_client(mock_client_session=mock_client_session, ssl_cert=ssl_cert)
+    client.request({})
+    assert mock_client_session.return_value.request.call_args[1]['ssl'] == mock_create_default_context.return_value
+    assert mock_create_default_context.return_value.load_cert_chain.call_args[0] == expected_args
+
+
+def test_use_custom_ssl_ca_and_cert(mock_client_session, mock_create_default_context):
+    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify='my_ca_cert', ssl_cert='my_cert')
+    client.request({})
+    assert mock_client_session.return_value.request.call_args[1]['ssl'] == mock_create_default_context.return_value
+    mock_create_default_context.assert_called_once_with(cafile='my_ca_cert')
+    assert mock_create_default_context.return_value.load_cert_chain.call_args[0] == ('my_cert',)
