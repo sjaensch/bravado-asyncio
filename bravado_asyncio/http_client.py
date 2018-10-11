@@ -2,6 +2,7 @@ import asyncio
 import logging
 import ssl
 from collections import Mapping
+from distutils.version import LooseVersion
 from typing import Any
 from typing import Callable  # noqa: F401
 from typing import cast
@@ -58,13 +59,11 @@ class AsyncioClient(HttpClient):
     async / await.
     """
 
-    ssl_verify: Optional[Union[bool, ssl.SSLContext]]
-
     def __init__(
         self,
         run_mode: RunMode=RunMode.THREAD,
         loop: Optional[asyncio.AbstractEventLoop]=None,
-        ssl_verify: Union[bool, str]=True,
+        ssl_verify: Optional[Union[bool, str]]=None,
         ssl_cert: Optional[Union[str, Sequence[str]]]=None,
     ) -> None:
         """Instantiate a client using the given run_mode. If you do not pass in an event loop, then
@@ -105,19 +104,19 @@ class AsyncioClient(HttpClient):
 
         # translate the requests-type SSL options to a ssl.SSLContext object as used by aiohttp.
         # see https://aiohttp.readthedocs.io/en/stable/client_advanced.html#ssl-control-for-tcp-sockets
-        self.ssl_verify = None  # None is the default value of the ssl argument for the aiohttp request function
-        if ssl_verify is False:
-            self.ssl_verify = False
-
         if isinstance(ssl_verify, str) or ssl_cert:
+            self.ssl_verify = True  # type: Optional[bool]
             cafile = None
             if isinstance(ssl_verify, str):
                 cafile = ssl_verify
-            self.ssl_verify = ssl.create_default_context(cafile=cafile)
+            self.ssl_context = ssl.create_default_context(cafile=cafile)  # type: Optional[ssl.SSLContext]
             if ssl_cert:
                 if isinstance(ssl_cert, str):
                     ssl_cert = [ssl_cert]
-                self.ssl_verify.load_cert_chain(*ssl_cert)
+                self.ssl_context.load_cert_chain(*ssl_cert)
+        else:
+            self.ssl_verify = ssl_verify
+            self.ssl_context = None
 
     def request(
         self,
@@ -182,8 +181,8 @@ class AsyncioClient(HttpClient):
                 for k, v in request_params.get('headers', {}).items()
             },
             skip_auto_headers=skip_auto_headers,
-            ssl=self.ssl_verify,
             timeout=timeout,
+            **self._get_ssl_params()
         )
 
         future = self.run_coroutine_func(coroutine, loop=self.loop)
@@ -204,3 +203,15 @@ class AsyncioClient(HttpClient):
             entries = [(key, str(value))] if not is_list_like(value) else [(key, str(v)) for v in value]
             items.extend(entries)
         return MultiDict(items)
+
+    def _get_ssl_params(self) -> Dict[str, Any]:
+        aiohttp_version = LooseVersion(aiohttp.__version__)
+        if aiohttp_version < LooseVersion('3'):
+            return {
+                'verify_ssl': self.ssl_verify,
+                'ssl_context': self.ssl_context
+            }
+        else:
+            return {
+                'ssl': self.ssl_context if self.ssl_context else self.ssl_verify
+            }

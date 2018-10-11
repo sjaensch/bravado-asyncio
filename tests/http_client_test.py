@@ -17,7 +17,7 @@ def mock_client_session():
 
 
 @pytest.fixture
-def asyncio_client(mock_client_session, ssl_verify=True, ssl_cert=None):
+def asyncio_client(mock_client_session, ssl_verify=None, ssl_cert=None):
     client = AsyncioClient(
         run_mode=RunMode.THREAD,
         loop=mock.Mock(spec=asyncio.AbstractEventLoop),
@@ -44,6 +44,18 @@ def request_params():
 
 
 @pytest.fixture
+def mock_aiohttp_version():
+    with mock.patch('aiohttp.__version__', new='3.0.0'):
+        yield
+
+
+@pytest.fixture
+def mock_legacy_aiohttp_version():
+    with mock.patch('aiohttp.__version__', new='2.3.10'):
+        yield
+
+
+@pytest.fixture
 def mock_create_default_context():
     with mock.patch('ssl.create_default_context', autospec=True) as _mock:
         yield _mock
@@ -54,6 +66,7 @@ def test_fail_on_unknown_run_mode():
         AsyncioClient(run_mode='unknown/invalid')
 
 
+@pytest.mark.usefixtures('mock_aiohttp_version')
 def test_request(asyncio_client, mock_client_session, request_params):
     """Make sure request calls the right functions and instantiates the HttpFuture correctly."""
     asyncio_client.response_adapter = mock.Mock(name='response_adapter', spec=AioHTTPResponseAdapter)
@@ -88,6 +101,7 @@ def test_request(asyncio_client, mock_client_session, request_params):
     )
 
 
+@pytest.mark.usefixtures('mock_aiohttp_version')
 def test_simple_get(asyncio_client, mock_client_session, request_params):
     request_params['params'] = {'foo': 'bar'}
 
@@ -113,6 +127,7 @@ def test_int_param(asyncio_client, mock_client_session, request_params):
     assert mock_client_session.return_value.request.call_args[1]['params'] == {'foo': '5'}
 
 
+@pytest.mark.usefixtures('mock_aiohttp_version')
 @pytest.mark.parametrize(
     'param_name, param_value, expected_param_value',
     (
@@ -184,6 +199,7 @@ def test_connect_timeout_logs_warning(asyncio_client, mock_client_session, reque
     assert mock_client_session.return_value.request.call_args[1]['timeout'] is None
 
 
+@pytest.mark.usefixtures('mock_aiohttp_version')
 def test_disable_ssl_verification(mock_client_session, mock_create_default_context):
     client = asyncio_client(mock_client_session=mock_client_session, ssl_verify=False)
     client.request({})
@@ -191,6 +207,7 @@ def test_disable_ssl_verification(mock_client_session, mock_create_default_conte
     assert mock_create_default_context.call_count == 0
 
 
+@pytest.mark.usefixtures('mock_aiohttp_version')
 def test_use_custom_ssl_ca(mock_client_session, mock_create_default_context):
     client = asyncio_client(mock_client_session=mock_client_session, ssl_verify='my_ca_cert')
     client.request({})
@@ -199,6 +216,7 @@ def test_use_custom_ssl_ca(mock_client_session, mock_create_default_context):
     assert mock_create_default_context.return_value.load_cert_chain.call_count == 0
 
 
+@pytest.mark.usefixtures('mock_aiohttp_version')
 @pytest.mark.parametrize(
     'ssl_cert, expected_args',
     (
@@ -214,9 +232,60 @@ def test_use_custom_ssl_cert(ssl_cert, expected_args, mock_client_session, mock_
     assert mock_create_default_context.return_value.load_cert_chain.call_args[0] == expected_args
 
 
+@pytest.mark.usefixtures('mock_aiohttp_version')
 def test_use_custom_ssl_ca_and_cert(mock_client_session, mock_create_default_context):
     client = asyncio_client(mock_client_session=mock_client_session, ssl_verify='my_ca_cert', ssl_cert='my_cert')
     client.request({})
     assert mock_client_session.return_value.request.call_args[1]['ssl'] == mock_create_default_context.return_value
+    mock_create_default_context.assert_called_once_with(cafile='my_ca_cert')
+    assert mock_create_default_context.return_value.load_cert_chain.call_args[0] == ('my_cert',)
+
+
+# SSL tests for legacy aiohttp versions (2.X)
+
+@pytest.mark.usefixtures('mock_legacy_aiohttp_version')
+def test_disable_ssl_verification_legacy(mock_client_session, mock_create_default_context):
+    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify=False)
+    client.request({})
+    assert mock_client_session.return_value.request.call_args[1]['verify_ssl'] is False
+    assert mock_create_default_context.call_count == 0
+
+
+@pytest.mark.usefixtures('mock_legacy_aiohttp_version')
+def test_use_custom_ssl_ca_legacy(mock_client_session, mock_create_default_context):
+    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify='my_ca_cert')
+    client.request({})
+    assert mock_client_session.return_value.request.call_args[1]['verify_ssl'] is True
+    assert mock_client_session.return_value.request.call_args[1]['ssl_context'] == \
+        mock_create_default_context.return_value
+    mock_create_default_context.assert_called_once_with(cafile='my_ca_cert')
+    assert mock_create_default_context.return_value.load_cert_chain.call_count == 0
+
+
+@pytest.mark.usefixtures('mock_legacy_aiohttp_version')
+@pytest.mark.parametrize(
+    'ssl_cert, expected_args',
+    (
+        ('my_cert', ('my_cert',)),
+        (['my_cert'], ('my_cert',)),
+        (['my_cert', 'my_key'], ('my_cert', 'my_key')),
+    ),
+)
+def test_use_custom_ssl_cert_legacy(ssl_cert, expected_args, mock_client_session, mock_create_default_context):
+    client = asyncio_client(mock_client_session=mock_client_session, ssl_cert=ssl_cert)
+    client.request({})
+    assert mock_client_session.return_value.request.call_args[1]['verify_ssl'] is True
+    assert mock_client_session.return_value.request.call_args[1]['ssl_context'] ==\
+        mock_create_default_context.return_value
+    assert mock_create_default_context.return_value.load_cert_chain.call_args[0] == expected_args
+
+
+@pytest.mark.usefixtures('mock_legacy_aiohttp_version')
+def test_use_custom_ssl_ca_and_cert_legacy(mock_client_session, mock_create_default_context):
+    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify='my_ca_cert', ssl_cert='my_cert')
+    client.request({})
+    assert mock_client_session.return_value.request.call_args[1]['verify_ssl'] is True
+    assert mock_client_session.return_value.request.call_args[1]['ssl_context'] == \
+        mock_create_default_context.return_value
     mock_create_default_context.assert_called_once_with(cafile='my_ca_cert')
     assert mock_create_default_context.return_value.load_cert_chain.call_args[0] == ('my_cert',)
