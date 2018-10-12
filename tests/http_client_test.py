@@ -50,12 +50,6 @@ def mock_aiohttp_version():
 
 
 @pytest.fixture
-def mock_legacy_aiohttp_version():
-    with mock.patch('aiohttp.__version__', new='2.3.10'):
-        yield
-
-
-@pytest.fixture
 def mock_create_default_context():
     with mock.patch('ssl.create_default_context', autospec=True) as _mock:
         yield _mock
@@ -237,55 +231,5 @@ def test_use_custom_ssl_ca_and_cert(mock_client_session, mock_create_default_con
     client = asyncio_client(mock_client_session=mock_client_session, ssl_verify='my_ca_cert', ssl_cert='my_cert')
     client.request({})
     assert mock_client_session.return_value.request.call_args[1]['ssl'] == mock_create_default_context.return_value
-    mock_create_default_context.assert_called_once_with(cafile='my_ca_cert')
-    assert mock_create_default_context.return_value.load_cert_chain.call_args[0] == ('my_cert',)
-
-
-# SSL tests for legacy aiohttp versions (2.X)
-
-@pytest.mark.usefixtures('mock_legacy_aiohttp_version')
-def test_disable_ssl_verification_legacy(mock_client_session, mock_create_default_context):
-    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify=False)
-    client.request({})
-    assert mock_client_session.return_value.request.call_args[1]['verify_ssl'] is False
-    assert mock_create_default_context.call_count == 0
-
-
-@pytest.mark.usefixtures('mock_legacy_aiohttp_version')
-def test_use_custom_ssl_ca_legacy(mock_client_session, mock_create_default_context):
-    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify='my_ca_cert')
-    client.request({})
-    assert mock_client_session.return_value.request.call_args[1]['verify_ssl'] is True
-    assert mock_client_session.return_value.request.call_args[1]['ssl_context'] == \
-        mock_create_default_context.return_value
-    mock_create_default_context.assert_called_once_with(cafile='my_ca_cert')
-    assert mock_create_default_context.return_value.load_cert_chain.call_count == 0
-
-
-@pytest.mark.usefixtures('mock_legacy_aiohttp_version')
-@pytest.mark.parametrize(
-    'ssl_cert, expected_args',
-    (
-        ('my_cert', ('my_cert',)),
-        (['my_cert'], ('my_cert',)),
-        (['my_cert', 'my_key'], ('my_cert', 'my_key')),
-    ),
-)
-def test_use_custom_ssl_cert_legacy(ssl_cert, expected_args, mock_client_session, mock_create_default_context):
-    client = asyncio_client(mock_client_session=mock_client_session, ssl_cert=ssl_cert)
-    client.request({})
-    assert mock_client_session.return_value.request.call_args[1]['verify_ssl'] is True
-    assert mock_client_session.return_value.request.call_args[1]['ssl_context'] ==\
-        mock_create_default_context.return_value
-    assert mock_create_default_context.return_value.load_cert_chain.call_args[0] == expected_args
-
-
-@pytest.mark.usefixtures('mock_legacy_aiohttp_version')
-def test_use_custom_ssl_ca_and_cert_legacy(mock_client_session, mock_create_default_context):
-    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify='my_ca_cert', ssl_cert='my_cert')
-    client.request({})
-    assert mock_client_session.return_value.request.call_args[1]['verify_ssl'] is True
-    assert mock_client_session.return_value.request.call_args[1]['ssl_context'] == \
-        mock_create_default_context.return_value
     mock_create_default_context.assert_called_once_with(cafile='my_ca_cert')
     assert mock_create_default_context.return_value.load_cert_chain.call_args[0] == ('my_cert',)

@@ -105,7 +105,7 @@ class AsyncioClient(HttpClient):
         # translate the requests-type SSL options to a ssl.SSLContext object as used by aiohttp.
         # see https://aiohttp.readthedocs.io/en/stable/client_advanced.html#ssl-control-for-tcp-sockets
         if isinstance(ssl_verify, str) or ssl_cert:
-            self.ssl_verify = True  # type: Optional[bool]
+            self.ssl_verify = None  # type: Optional[bool]
             cafile = None
             if isinstance(ssl_verify, str):
                 cafile = ssl_verify
@@ -207,10 +207,9 @@ class AsyncioClient(HttpClient):
     def _get_ssl_params(self) -> Dict[str, Any]:
         aiohttp_version = LooseVersion(aiohttp.__version__)
         if aiohttp_version < LooseVersion('3'):
-            return {
-                'verify_ssl': self.ssl_verify,
-                'ssl_context': self.ssl_context
-            }
+            if (self.ssl_verify is not None) or (self.ssl_context is not None):
+                log.warning('SSL options are not supported and will be ignored for aiohttp versions below 3.')
+            return {}
         else:
             return {
                 'ssl': self.ssl_context if self.ssl_context else self.ssl_verify
