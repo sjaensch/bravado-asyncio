@@ -1,5 +1,8 @@
 Changelog
 =========
+1.3.0 (2018-10-17)
+------------------
+- Support customizing or disabling TLS/SSL verification - PR #21
 
 1.2.0 (2018-07-02)
 ------------------
