@@ -1,11 +1,14 @@
 import asyncio
 import logging
+import ssl
 from collections import Mapping
+from distutils.version import LooseVersion
 from typing import Any
 from typing import Callable  # noqa: F401
 from typing import cast
 from typing import Dict
 from typing import Optional
+from typing import Sequence
 from typing import Union
 
 import aiohttp
@@ -56,12 +59,24 @@ class AsyncioClient(HttpClient):
     async / await.
     """
 
-    def __init__(self, run_mode: RunMode=RunMode.THREAD, loop: Optional[asyncio.AbstractEventLoop]=None) -> None:
+    def __init__(
+        self,
+        run_mode: RunMode=RunMode.THREAD,
+        loop: Optional[asyncio.AbstractEventLoop]=None,
+        ssl_verify: Optional[Union[bool, str]]=None,
+        ssl_cert: Optional[Union[str, Sequence[str]]]=None,
+    ) -> None:
         """Instantiate a client using the given run_mode. If you do not pass in an event loop, then
         either a shared loop in a separate thread (THREAD mode) or the default asyncio
         event loop (FULL_ASYNCIO mode) will be used.
         Not passing in an event loop will make sure we share the :py:class:`aiohttp.ClientSession` object
         between AsyncioClient instances.
+
+        :param ssl_verify: Set to False to disable SSL certificate validation. Provide the path to a
+            CA bundle if you need to use a custom one.
+        :param ssl_cert: Provide a client-side certificate to use. Either a sequence of strings pointing
+            to the certificate (1) and the private key (2), or a string pointing to the combined certificate
+            and key.
         """
         self.run_mode = run_mode
         if self.run_mode == RunMode.THREAD:
@@ -87,11 +102,27 @@ class AsyncioClient(HttpClient):
         else:
             self.client_session = get_client_session(self.loop)
 
+        # translate the requests-type SSL options to a ssl.SSLContext object as used by aiohttp.
+        # see https://aiohttp.readthedocs.io/en/stable/client_advanced.html#ssl-control-for-tcp-sockets
+        if isinstance(ssl_verify, str) or ssl_cert:
+            self.ssl_verify = None  # type: Optional[bool]
+            cafile = None
+            if isinstance(ssl_verify, str):
+                cafile = ssl_verify
+            self.ssl_context = ssl.create_default_context(cafile=cafile)  # type: Optional[ssl.SSLContext]
+            if ssl_cert:
+                if isinstance(ssl_cert, str):
+                    ssl_cert = [ssl_cert]
+                self.ssl_context.load_cert_chain(*ssl_cert)
+        else:
+            self.ssl_verify = ssl_verify
+            self.ssl_context = None
+
     def request(
-            self,
-            request_params: Dict[str, Any],
-            operation: Optional[Operation]=None,
-            request_config: Optional[RequestConfig]=None,
+        self,
+        request_params: Dict[str, Any],
+        operation: Optional[Operation]=None,
+        request_config: Optional[RequestConfig]=None,
     ) -> HttpFuture:
         """Sets up the request params for aiohttp and executes the request in the background.
 
@@ -151,6 +182,7 @@ class AsyncioClient(HttpClient):
             },
             skip_auto_headers=skip_auto_headers,
             timeout=timeout,
+            **self._get_ssl_params()
         )
 
         future = self.run_coroutine_func(coroutine, loop=self.loop)
@@ -171,3 +203,14 @@ class AsyncioClient(HttpClient):
             entries = [(key, str(value))] if not is_list_like(value) else [(key, str(v)) for v in value]
             items.extend(entries)
         return MultiDict(items)
+
+    def _get_ssl_params(self) -> Dict[str, Any]:
+        aiohttp_version = LooseVersion(aiohttp.__version__)
+        if aiohttp_version < LooseVersion('3'):
+            if (self.ssl_verify is not None) or (self.ssl_context is not None):
+                log.warning('SSL options are not supported and will be ignored for aiohttp versions below 3.')
+            return {}
+        else:
+            return {
+                'ssl': self.ssl_context if self.ssl_context else self.ssl_verify
+            }
