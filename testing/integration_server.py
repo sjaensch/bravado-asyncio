@@ -20,9 +20,9 @@ async def store_inventory(request):
 
 async def login(request):
     if not (
-        request.query.get('username') == 'asyncio'
-        and request.query.get('password') == 'p%s&wörd?'
-        and request.query.get('invalidate_sessions') in ('True', 'true')
+        request.query.get('username') == 'asyncio' and
+        request.query.get('password') == 'p%s&wörd?' and
+        request.query.get('invalidate_sessions') in ('True', 'true')
     ):
         return web.HTTPBadRequest()
 
@@ -65,11 +65,11 @@ async def update_pet_formdata(request):
 
     post_data = await request.post()
     if not (
-        request.match_info['petId'] == '12'
-        and post_data.get('name') == 'Vivi'
-        and post_data.get('status') == 'sold'
-        and request.headers.get('userId') == '42'
-        and post_data.getall('photoUrls') == ['http://first.url?param1=value1&param2=ß%$', 'http://second.url']
+        request.match_info['petId'] == '12' and
+        post_data.get('name') == 'Vivi' and
+        post_data.get('status') == 'sold' and
+        request.headers.get('userId') == '42' and
+        post_data.getall('photoUrls') == ['http://first.url?param1=value1&param2=ß%$', 'http://second.url']
     ):
         return web.HTTPNotFound()
 
@@ -89,8 +89,8 @@ async def upload_pet_image(request):
         return web.HTTPBadRequest()
 
     if not (
-        request.match_info['petId'] == '42'
-        and data.get('userId') == '12'
+        request.match_info['petId'] == '42' and
+        data.get('userId') == '12'
     ):
         return web.HTTPBadRequest()
 
