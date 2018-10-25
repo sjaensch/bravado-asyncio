@@ -61,10 +61,10 @@ class AsyncioClient(HttpClient):
 
     def __init__(
         self,
-        run_mode: RunMode=RunMode.THREAD,
-        loop: Optional[asyncio.AbstractEventLoop]=None,
-        ssl_verify: Optional[Union[bool, str]]=None,
-        ssl_cert: Optional[Union[str, Sequence[str]]]=None,
+        run_mode: RunMode = RunMode.THREAD,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        ssl_verify: Optional[Union[bool, str]] = None,
+        ssl_cert: Optional[Union[str, Sequence[str]]] = None,
     ) -> None:
         """Instantiate a client using the given run_mode. If you do not pass in an event loop, then
         either a shared loop in a separate thread (THREAD mode) or the default asyncio
@@ -121,8 +121,8 @@ class AsyncioClient(HttpClient):
     def request(
         self,
         request_params: Dict[str, Any],
-        operation: Optional[Operation]=None,
-        request_config: Optional[RequestConfig]=None,
+        operation: Optional[Operation] = None,
+        request_config: Optional[RequestConfig] = None,
     ) -> HttpFuture:
         """Sets up the request params for aiohttp and executes the request in the background.
 

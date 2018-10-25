@@ -19,7 +19,7 @@ class FutureAdapter(BaseFutureAdapter):
     def __init__(self, future: concurrent.futures.Future) -> None:
         self.future = future
 
-    def result(self, timeout: Optional[float]=None) -> AsyncioResponse:
+    def result(self, timeout: Optional[float] = None) -> AsyncioResponse:
         start = time.monotonic()
         response = self.future.result(timeout)
         time_elapsed = time.monotonic() - start
@@ -38,7 +38,7 @@ class AsyncioFutureAdapter(BaseFutureAdapter):
     def __init__(self, future: asyncio.Future) -> None:
         self.future = future
 
-    async def result(self, timeout: Optional[float]=None) -> AsyncioResponse:
+    async def result(self, timeout: Optional[float] = None) -> AsyncioResponse:
         start = time.monotonic()
         response = await asyncio.wait_for(self.future, timeout=timeout)
         time_elapsed = time.monotonic() - start
