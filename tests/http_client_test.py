@@ -16,8 +16,7 @@ def mock_client_session():
         yield _mock
 
 
-@pytest.fixture
-def asyncio_client(mock_client_session, ssl_verify=None, ssl_cert=None):
+def get_asyncio_client(ssl_verify=None, ssl_cert=None):
     client = AsyncioClient(
         run_mode=RunMode.THREAD,
         loop=mock.Mock(spec=asyncio.AbstractEventLoop),
@@ -26,6 +25,11 @@ def asyncio_client(mock_client_session, ssl_verify=None, ssl_cert=None):
     )
     client.run_coroutine_func = mock.Mock('run_coroutine_func')
     return client
+
+
+@pytest.fixture
+def asyncio_client(mock_client_session):
+    return get_asyncio_client()
 
 
 @pytest.fixture
@@ -195,7 +199,7 @@ def test_connect_timeout_logs_warning(asyncio_client, mock_client_session, reque
 
 @pytest.mark.usefixtures('mock_aiohttp_version')
 def test_disable_ssl_verification(mock_client_session, mock_create_default_context):
-    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify=False)
+    client = get_asyncio_client(ssl_verify=False)
     client.request({})
     assert mock_client_session.return_value.request.call_args[1]['ssl'] is False
     assert mock_create_default_context.call_count == 0
@@ -203,7 +207,7 @@ def test_disable_ssl_verification(mock_client_session, mock_create_default_conte
 
 @pytest.mark.usefixtures('mock_aiohttp_version')
 def test_use_custom_ssl_ca(mock_client_session, mock_create_default_context):
-    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify='my_ca_cert')
+    client = get_asyncio_client(ssl_verify='my_ca_cert')
     client.request({})
     assert mock_client_session.return_value.request.call_args[1]['ssl'] == mock_create_default_context.return_value
     mock_create_default_context.assert_called_once_with(cafile='my_ca_cert')
@@ -220,7 +224,7 @@ def test_use_custom_ssl_ca(mock_client_session, mock_create_default_context):
     ),
 )
 def test_use_custom_ssl_cert(ssl_cert, expected_args, mock_client_session, mock_create_default_context):
-    client = asyncio_client(mock_client_session=mock_client_session, ssl_cert=ssl_cert)
+    client = get_asyncio_client(ssl_cert=ssl_cert)
     client.request({})
     assert mock_client_session.return_value.request.call_args[1]['ssl'] == mock_create_default_context.return_value
     assert mock_create_default_context.return_value.load_cert_chain.call_args[0] == expected_args
@@ -228,7 +232,7 @@ def test_use_custom_ssl_cert(ssl_cert, expected_args, mock_client_session, mock_
 
 @pytest.mark.usefixtures('mock_aiohttp_version')
 def test_use_custom_ssl_ca_and_cert(mock_client_session, mock_create_default_context):
-    client = asyncio_client(mock_client_session=mock_client_session, ssl_verify='my_ca_cert', ssl_cert='my_cert')
+    client = get_asyncio_client(ssl_verify='my_ca_cert', ssl_cert='my_cert')
     client.request({})
     assert mock_client_session.return_value.request.call_args[1]['ssl'] == mock_create_default_context.return_value
     mock_create_default_context.assert_called_once_with(cafile='my_ca_cert')
