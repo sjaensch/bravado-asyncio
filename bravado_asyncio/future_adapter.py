@@ -1,7 +1,10 @@
 import asyncio
 import concurrent.futures
 import time
-from typing import Optional
+from typing import (
+    Optional,
+    Type,
+    )
 
 import aiohttp.client_exceptions
 from bravado.http_future import FutureAdapter as BaseFutureAdapter
