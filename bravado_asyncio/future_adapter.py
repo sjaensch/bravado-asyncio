@@ -38,7 +38,7 @@ class AsyncioFutureAdapter(BaseFutureAdapter):
     def __init__(self, future: asyncio.Future) -> None:
         self.future = future
 
-    async def result(self, timeout: Optional[float] = None, loop=None) -> AsyncioResponse:
+    async def result(self, timeout: Optional[float] = None, loop: Optional[Type[asyncio.base_events.BaseEventLoop]]=None) -> AsyncioResponse:
         start = time.monotonic()
         response = await asyncio.wait_for(self.future, timeout=timeout, loop=loop)
         time_elapsed = time.monotonic() - start
