@@ -53,7 +53,7 @@ def test_asyncio_future_adapter(mock_future, mock_wait_for, mock_response, event
     assert result.response is mock_response
     assert 0 < result.remaining_timeout < 5
 
-    mock_wait_for.assert_called_once_with(mock_future, timeout=5)
+    mock_wait_for.assert_called_once_with(mock_future, timeout=5, loop=None)
 
 
 def test_asyncio_future_adapter_timeout_error_class():
