@@ -2,7 +2,6 @@ import asyncio
 import logging
 import ssl
 from collections import Mapping
-from distutils.version import LooseVersion
 from typing import Any
 from typing import Callable  # noqa: F401
 from typing import cast
@@ -158,13 +157,13 @@ class AsyncioClient(HttpClient):
 
         params = self.prepare_params(request_params.get('params'))
 
-        connect_timeout = request_params.get('connect_timeout')
-        if connect_timeout:
-            log.warning(
-                'bravado-asyncio does not support setting a connect_timeout '
-                '(you passed a value of {})'.format(connect_timeout),
-            )
-        timeout = request_params.get('timeout')
+        connect_timeout = request_params.get('connect_timeout')  # type: Optional[float]
+        request_timeout = request_params.get('timeout')  # type: Optional[float]
+        # mypy thinks the type of total and connect is float, even though it is Optional[float]. Let's ignore the error.
+        timeout = aiohttp.ClientTimeout(  # type: ignore
+            total=request_timeout,
+            connect=connect_timeout,
+        ) if (connect_timeout or request_timeout) else None
 
         # aiohttp always adds a Content-Type header, and this breaks some servers that don't
         # expect it for non-POST/PUT requests: https://github.com/aio-libs/aiohttp/issues/457
@@ -205,12 +204,6 @@ class AsyncioClient(HttpClient):
         return MultiDict(items)
 
     def _get_ssl_params(self) -> Dict[str, Any]:
-        aiohttp_version = LooseVersion(aiohttp.__version__)
-        if aiohttp_version < LooseVersion('3'):
-            if (self.ssl_verify is not None) or (self.ssl_context is not None):
-                log.warning('SSL options are not supported and will be ignored for aiohttp versions below 3.')
-            return {}
-        else:
-            return {
-                'ssl': self.ssl_context if self.ssl_context else self.ssl_verify
-            }
+        return {
+            'ssl': self.ssl_context if self.ssl_context else self.ssl_verify
+        }
