@@ -1,5 +1,10 @@
 Changelog
 =========
+1.4.0 (2019-01-09)
+------------------
+- Add support for connect timeouts. This requires at least aiohttp 3.3, which in turn requires at least Python 3.5.3. - Issue #24, PR #25
+- Removed support for aiohttp versions below 3.3, and Python versions below 3.5.3.
+
 1.3.0 (2018-10-17)
 ------------------
 - Support customizing or disabling TLS/SSL verification - PR #21
