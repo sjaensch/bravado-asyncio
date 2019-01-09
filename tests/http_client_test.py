@@ -1,5 +1,6 @@
 import asyncio
 
+import aiohttp
 import mock
 import pytest
 from bravado.http_future import HttpFuture
@@ -30,12 +31,6 @@ def get_asyncio_client(ssl_verify=None, ssl_cert=None):
 @pytest.fixture
 def asyncio_client(mock_client_session):
     return get_asyncio_client()
-
-
-@pytest.fixture
-def mock_log():
-    with mock.patch('bravado_asyncio.http_client.log') as _mock:
-        yield _mock
 
 
 @pytest.fixture
@@ -187,14 +182,16 @@ def test_file_data_int_filename(asyncio_client, mock_client_session, request_par
     assert field_data[2] == FileObj.read.return_value
 
 
-def test_connect_timeout_logs_warning(asyncio_client, mock_client_session, request_params, mock_log):
+def test_timeouts(asyncio_client, mock_client_session, request_params):
     request_params['connect_timeout'] = 0.1
+    request_params['timeout'] = 1.0
 
     asyncio_client.request(request_params)
 
-    assert mock_log.warning.call_count == 1
-    assert 'connect_timeout' in mock_log.warning.call_args[0][0]
-    assert mock_client_session.return_value.request.call_args[1]['timeout'] is None
+    assert mock_client_session.return_value.request.call_args[1]['timeout'] == aiohttp.ClientTimeout(
+        total=1.0,
+        connect=0.1,
+    )
 
 
 @pytest.mark.usefixtures('mock_aiohttp_version')

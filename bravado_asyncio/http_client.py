@@ -159,12 +159,11 @@ class AsyncioClient(HttpClient):
         params = self.prepare_params(request_params.get('params'))
 
         connect_timeout = request_params.get('connect_timeout')
-        if connect_timeout:
-            log.warning(
-                'bravado-asyncio does not support setting a connect_timeout '
-                '(you passed a value of {})'.format(connect_timeout),
-            )
-        timeout = request_params.get('timeout')
+        request_timeout = request_params.get('timeout')
+        timeout = aiohttp.ClientTimeout(
+            total=request_timeout,
+            connect=connect_timeout,
+        ) if (connect_timeout or request_timeout) else None
 
         # aiohttp always adds a Content-Type header, and this breaks some servers that don't
         # expect it for non-POST/PUT requests: https://github.com/aio-libs/aiohttp/issues/457
