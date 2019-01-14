@@ -7,5 +7,6 @@ mock
 mypy
 pytest
 tox
+tox-pip-extensions
 u-msgpack-python
 wheel
