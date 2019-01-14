@@ -160,7 +160,7 @@ class AsyncioClient(HttpClient):
         connect_timeout = request_params.get('connect_timeout')  # type: Optional[float]
         request_timeout = request_params.get('timeout')  # type: Optional[float]
         # mypy thinks the type of total and connect is float, even though it is Optional[float]. Let's ignore the error.
-        timeout = aiohttp.ClientTimeout(  # type: ignore
+        timeout = aiohttp.ClientTimeout(
             total=request_timeout,
             connect=connect_timeout,
         ) if (connect_timeout or request_timeout) else None
