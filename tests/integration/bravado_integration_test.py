@@ -14,9 +14,6 @@ class TestServerBravadoAsyncioClient(IntegrationTestsBaseClass):
         aiohttp.ClientConnectionError(),
     }
 
-    def cancel_http_future(self, http_future):
-        http_future.future.future.cancel()
-
     def test_bytes_header(self, swagger_http_server):
         # TODO: integrate this test into bravado integration tests suite
         response = self.http_client.request({

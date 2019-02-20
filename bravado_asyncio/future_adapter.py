@@ -1,12 +1,19 @@
 import asyncio
 import concurrent.futures
 import time
+from typing import Any
 from typing import Optional
 
 import aiohttp.client_exceptions
-from bravado.http_future import FutureAdapter as BaseFutureAdapter
+from bravado.http_future import FutureAdapter as BravadoFutureAdapter
 
 from bravado_asyncio.definitions import AsyncioResponse
+
+
+class BaseFutureAdapter(BravadoFutureAdapter):
+
+    def __init__(self, future: Any) -> None:
+        raise NotImplementedError('Do not instantiate BaseFutureAdapter, use one of its subclasses')
 
 
 class FutureAdapter(BaseFutureAdapter):
@@ -27,6 +34,9 @@ class FutureAdapter(BaseFutureAdapter):
 
         return AsyncioResponse(response=response, remaining_timeout=remaining_timeout)
 
+    def cancel(self) -> None:
+        self.future.cancel()
+
 
 class AsyncioFutureAdapter(BaseFutureAdapter):
     """FutureAdapter that will be used when run_mode is FULL_ASYNCIO. The result method is
@@ -45,3 +55,6 @@ class AsyncioFutureAdapter(BaseFutureAdapter):
         remaining_timeout = timeout - time_elapsed if timeout else None
 
         return AsyncioResponse(response=response, remaining_timeout=remaining_timeout)
+
+    def cancel(self) -> None:
+        self.future.cancel()
