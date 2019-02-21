@@ -2,11 +2,6 @@ repos:
 -   repo: git://github.com/pre-commit/pre-commit-hooks
     sha: v1.1.1
     hooks:
-    -   id: autopep8-wrapper
-        language_version: python3.6
-        args:
-        - -i
-        - --ignore=E309,E501
     -   id: check-added-large-files
         language_version: python3.6
     -   id: check-byte-order-marker
@@ -23,8 +18,6 @@ repos:
         language_version: python3.6
         args:
         - --remove
-    -   id: flake8
-        language_version: python3.6
     -   id: name-tests-test
         language_version: python3.6
     -   id: trailing-whitespace
@@ -32,6 +25,18 @@ repos:
     -   id: requirements-txt-fixer
         language_version: python3.6
         files: requirements-dev.txt
+-   repo: git://github.com/pre-commit/mirrors-autopep8
+    rev: v1.4.3
+    hooks:
+    -   id: autopep8
+        args: ['-i', '--ignore=E309,E501']
+        language_version: python3.6
+-   repo: https://gitlab.com/pycqa/flake8.git
+    rev: 3.7.6
+    hooks:
+    -   id: flake8
+        exclude: ^docs
+        language_version: python3.6
 -   repo: https://github.com/asottile/pyupgrade
     sha: v1.2.0
     hooks:
