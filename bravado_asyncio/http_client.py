@@ -6,8 +6,10 @@ from typing import Any
 from typing import Callable  # noqa: F401
 from typing import cast
 from typing import Dict
+from typing import MutableMapping
 from typing import Optional
 from typing import Sequence
+from typing import Type
 from typing import Union
 
 import aiohttp
@@ -23,11 +25,11 @@ from yelp_bytes import from_bytes
 
 from bravado_asyncio.definitions import RunMode
 from bravado_asyncio.future_adapter import AsyncioFutureAdapter
+from bravado_asyncio.future_adapter import BaseFutureAdapter
 from bravado_asyncio.future_adapter import FutureAdapter
 from bravado_asyncio.response_adapter import AioHTTPResponseAdapter
 from bravado_asyncio.response_adapter import AsyncioHTTPResponseAdapter
 from bravado_asyncio.thread_loop import get_thread_loop
-
 
 log = logging.getLogger(__name__)
 
@@ -83,7 +85,7 @@ class AsyncioClient(HttpClient):
             self.run_coroutine_func = asyncio.run_coroutine_threadsafe  # type: Callable
             self.response_adapter = AioHTTPResponseAdapter
             self.bravado_future_class = HttpFuture
-            self.future_adapter = FutureAdapter  # type: http_future.FutureAdapter
+            self.future_adapter = FutureAdapter  # type: Type[BaseFutureAdapter]
         elif run_mode == RunMode.FULL_ASYNCIO:
             from aiobravado.http_future import HttpFuture as AsyncioHttpFuture
 
@@ -119,7 +121,7 @@ class AsyncioClient(HttpClient):
 
     def request(
         self,
-        request_params: Dict[str, Any],
+        request_params: MutableMapping[str, Any],
         operation: Optional[Operation] = None,
         request_config: Optional[RequestConfig] = None,
     ) -> HttpFuture:
