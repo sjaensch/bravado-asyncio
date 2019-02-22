@@ -31,7 +31,7 @@ setup(
     ],
     install_requires=[
         'aiohttp>=3.3',
-        'bravado>=10.0.0',
+        'bravado>=10.3.0',
         'yelp-bytes',
     ],
     extras_require={

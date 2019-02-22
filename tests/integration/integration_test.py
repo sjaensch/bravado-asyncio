@@ -2,6 +2,7 @@ import asyncio
 import io
 import os.path
 import time
+from concurrent.futures import CancelledError
 
 import pytest
 from bravado import requests_client
@@ -20,10 +21,14 @@ def swagger_client(integration_server, request):
     # to make sure they both behave the same.
     # Once this integration suite has become stable (i.e. we're happy with the approach and the test coverage)
     # it could move to bravado and test all major HTTP clients (requests, fido, asyncio).
-    spec_url = '{}/swagger.yaml'.format(integration_server)
+    return get_swagger_client(integration_server, request.param())
+
+
+def get_swagger_client(server_url, http_client_instance):
+    spec_url = '{}/swagger.yaml'.format(server_url)
     return SwaggerClient.from_url(
         spec_url,
-        http_client=request.param(),
+        http_client=http_client_instance,
         config={'also_return_response': True},
     )
 
@@ -155,6 +160,17 @@ def test_server_500(swagger_client):
         swagger_client.pet.deletePet(petId=42).result(timeout=1)
 
 
+def test_cancellation(integration_server):
+    swagger_client = get_swagger_client(integration_server, http_client.AsyncioClient())
+    bravado_future = swagger_client.store.getInventory()  # request takes roughly 1 second to complete
+    bravado_future.cancel()
+
+    with pytest.raises(CancelledError):
+        bravado_future.result()
+
+    bravado_future.cancel()  # make sure we can call it again without issues
+
+
 def test_timeout_on_future(swagger_client):
     with pytest.raises(BravadoTimeoutError):
         bravado_future = swagger_client.store.getInventory()
@@ -203,20 +219,11 @@ async def sleep_coroutine():
     return 42
 
 
-async def get_swagger_client(spec_url):
-    return SwaggerClient.from_url(
-        spec_url,
-        http_client=http_client.AsyncioClient(),
-    )
-
-
 async def _test_asyncio_client(integration_server):
-    spec_url = '{}/swagger.yaml'.format(integration_server)
     # schedule our first coroutine (after _test_asyncio_client) in the default event loop
     future = asyncio.ensure_future(sleep_coroutine())
-    # more work for the default event loop
-    client1 = await get_swagger_client(spec_url)
-    client2 = await get_swagger_client(spec_url.replace('localhost', '127.0.0.1'))
+    client1 = get_swagger_client(integration_server, http_client.AsyncioClient())
+    client2 = get_swagger_client(integration_server.replace('localhost', '127.0.0.1'), http_client.AsyncioClient())
 
     # two tasks for the event loop running in a separate thread
     future1 = client1.store.getInventory()
@@ -225,10 +232,10 @@ async def _test_asyncio_client(integration_server):
     result = await future
     assert result == 42
 
-    result1 = future1.result(timeout=5)
+    result1, _ = future1.result(timeout=5)
     assert result1 == {}
 
-    result2 = future2.result(timeout=5)
+    result2, _ = future2.result(timeout=5)
     assert result2 == {}
 
     return True
