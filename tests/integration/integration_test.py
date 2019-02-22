@@ -186,6 +186,7 @@ def test_cancellation(integration_server):
     bravado_future.cancel()  # make sure we can call it again without issues
 
 
+@pytest.mark.xfail(reason='Setting the timeout through aiohttp does not seem to have an effect sometimes')
 def test_timeout_request_options(swagger_client):
     other_future = swagger_client.pet.getPetById(petId=42)
     with pytest.raises(BravadoTimeoutError):
