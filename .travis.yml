@@ -6,6 +6,11 @@ matrix:
     python: "3.5"
   - env: TOXENV=py36
     python: "3.6"
+  - env: TOXENV=py37
+    python: "3.7"
+    # see https://github.com/travis-ci/travis-ci/issues/9069#issuecomment-425720905
+    dist: xenial
+    sudo: required
   - env: TOXENV=pre-commit
     python: "3.6"
 
