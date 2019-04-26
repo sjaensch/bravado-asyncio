@@ -1,5 +1,11 @@
 Changelog
 =========
+
+1.4.1 (2019-04-26)
+------------------
+- Add support for HttpFuture.cancel() from bravado 10.3.0 - PR #27
+- Remove workaround code for file uploads that is no longer required, and might cause issues sometimes - PR #30
+
 1.4.0 (2019-01-09)
 ------------------
 - Add support for connect timeouts. This requires at least aiohttp 3.3, which in turn requires at least Python 3.5.3. - Issue #24, PR #25
