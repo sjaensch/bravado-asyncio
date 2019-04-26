@@ -179,7 +179,7 @@ def test_file_data_int_filename(asyncio_client, mock_client_session, request_par
     field_data = mock_client_session.return_value.request.call_args[1]['data']._fields[0]
     assert field_data[0]['name'] == 'picture'
     assert field_data[0]['filename'] == 'filename'
-    assert field_data[2] == FileObj.read.return_value
+    assert field_data[2] == FileObj
 
 
 def test_timeouts(asyncio_client, mock_client_session, request_params):
