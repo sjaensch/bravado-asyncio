@@ -149,12 +149,6 @@ class AsyncioClient(HttpClient):
         if isinstance(data, FormData):
             for name, file_tuple in request_params.get('files', {}):
                 stream_obj = file_tuple[1]
-                if not hasattr(stream_obj, 'name') or not isinstance(stream_obj.name, str):
-                    # work around an issue in aiohttp: it's not able to deal with names of type int. We've observed
-                    # this case in the real world and it is a documented possibility:
-                    # https://docs.python.org/3/library/io.html#raw-file-i-o
-                    stream_obj = stream_obj.read()
-
                 data.add_field(name, stream_obj, filename=file_tuple[0])
 
         params = self.prepare_params(request_params.get('params'))
