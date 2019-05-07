@@ -8,25 +8,20 @@ pool:
 strategy:
   matrix:
     Python35:
-      variables:
-        toxenv: py35
+      TOXENV: 'py35'
       python.version: '3.5'
     Python36:
-      variables:
-        toxenv: py36
+      TOXENV: 'py36'
       python.version: '3.6'
     Python37:
-      variables:
-        toxenv: py37
+      TOXENV: 'py37'
       python.version: '3.7'
     pre-commit:
-      variables:
-        toxenv: pre-commit
+      TOXENV: 'pre-commit'
       python.version: '3.6'
     Windows:
-      imageName: "vs2017-win2016"
-      variables:
-        toxenv: py36
+      imageName: 'vs2017-win2016'
+      TOXENV: 'py36'
       python.version: '3.6'
 
 steps:
@@ -39,5 +34,5 @@ steps:
     python -m pip install --upgrade pip tox
   displayName: 'Install pip and tox'
 
-- script: tox
+- script: 'tox -e $(TOXENV)'
   displayName: 'Run tox'
