@@ -1,0 +1,43 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+pool:
+  vmImage: 'ubuntu-latest'
+strategy:
+  matrix:
+    Python35:
+      variables:
+        toxenv: py35
+      python.version: '3.5'
+    Python36:
+      variables:
+        toxenv: py36
+      python.version: '3.6'
+    Python37:
+      variables:
+        toxenv: py37
+      python.version: '3.7'
+    pre-commit:
+      variables:
+        toxenv: pre-commit
+      python.version: '3.6'
+    Windows:
+      imageName: "vs2017-win2016"
+      variables:
+        toxenv: py36
+      python.version: '3.6'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(python.version)'
+  displayName: 'Use Python $(python.version)'
+
+- script: |
+    python -m pip install --upgrade pip tox
+  displayName: 'Install pip and tox'
+
+- script: tox
+  displayName: 'Run tox'
