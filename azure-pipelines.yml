@@ -3,36 +3,97 @@
 # Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
-pool:
-  vmImage: 'ubuntu-latest'
-strategy:
-  matrix:
-    Python35:
-      TOXENV: 'py35'
-      python.version: '3.5'
-    Python36:
-      TOXENV: 'py36'
-      python.version: '3.6'
-    Python37:
-      TOXENV: 'py37'
-      python.version: '3.7'
-    pre-commit:
-      TOXENV: 'pre-commit'
-      python.version: '3.6'
-    Windows:
-      imageName: 'vs2017-win2016'
-      TOXENV: 'py36'
-      python.version: '3.6'
+jobs:
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+- job: "TestLinux"
+  pool:
+    vmImage: 'ubuntu-latest'
+  strategy:
+    matrix:
+      Python35:
+        TOXENV: 'py35'
+        python.version: '3.5'
+      Python36:
+        TOXENV: 'py36'
+        python.version: '3.6'
+      Python37:
+        TOXENV: 'py37'
+        python.version: '3.7'
+      pre-commit:
+        TOXENV: 'pre-commit'
+        python.version: '3.6'
 
-- script: |
-    python -m pip install --upgrade pip tox
-  displayName: 'Install pip and tox'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
 
-- script: 'tox -e $(TOXENV)'
-  displayName: 'Run tox'
+  - script: |
+      python -m pip install --upgrade pip tox
+    displayName: 'Install pip and tox'
+
+  - script: 'tox -e $(TOXENV)'
+    displayName: 'Run tox'
+
+- job: "TestMac"
+  pool:
+    vmImage: 'macOS-10.14'
+  strategy:
+    matrix:
+      Python35:
+        TOXENV: 'py35'
+        python.version: '3.5'
+      Python36:
+        TOXENV: 'py36'
+        python.version: '3.6'
+      Python37:
+        TOXENV: 'py37'
+        python.version: '3.7'
+      pre-commit:
+        TOXENV: 'pre-commit'
+        python.version: '3.6'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
+
+  - script: |
+      python -m pip install --upgrade pip tox
+    displayName: 'Install pip and tox'
+
+  - script: 'tox -e $(TOXENV)'
+    displayName: 'Run tox'
+
+- job: "TestWindows"
+  pool:
+    vmImage: 'windows-2019'
+  strategy:
+    matrix:
+      Python35:
+        TOXENV: 'py35'
+        python.version: '3.5'
+      Python36:
+        TOXENV: 'py36'
+        python.version: '3.6'
+      Python37:
+        TOXENV: 'py37'
+        python.version: '3.7'
+      pre-commit:
+        TOXENV: 'pre-commit'
+        python.version: '3.6'
+
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
+
+  - script: |
+      python -m pip install --upgrade pip tox
+    displayName: 'Install pip and tox'
+
+  - script: 'tox -e $(TOXENV)'
+    displayName: 'Run tox'
