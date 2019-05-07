@@ -1,3 +1,5 @@
+# let's ignore symlinks, otherwise certain hooks complain on Windows
+exclude: '^(\.activate\.sh|docs/changelog\.rst)$'
 repos:
 -   repo: git://github.com/pre-commit/pre-commit-hooks
     sha: v1.1.1
@@ -22,6 +24,8 @@ repos:
         language_version: python3.6
     -   id: trailing-whitespace
         language_version: python3.6
+        # this hook doesn't seem to honor the global exclude setting
+        exclude: '^(\.activate\.sh|docs/changelog\.rst)$'
     -   id: requirements-txt-fixer
         language_version: python3.6
         files: requirements-dev.txt
