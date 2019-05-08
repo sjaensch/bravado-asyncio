@@ -1,4 +1,7 @@
+import sys
+
 import aiohttp.client_exceptions
+import pytest
 from bravado.testing.integration_test import IntegrationTestsBaseClass
 from bravado.testing.integration_test import ROUTE_1_RESPONSE
 
@@ -6,6 +9,10 @@ from bravado_asyncio.future_adapter import FutureAdapter
 from bravado_asyncio.http_client import AsyncioClient
 
 
+@pytest.mark.xfail(
+    sys.platform != 'linux',
+    reason='These integration tests are flaky (run into TimeoutErrors) on Windows and macOS on Azure Pipelines',
+)
 class TestServerBravadoAsyncioClient(IntegrationTestsBaseClass):
 
     http_client_type = AsyncioClient
