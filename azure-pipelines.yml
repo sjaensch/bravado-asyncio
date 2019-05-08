@@ -82,9 +82,10 @@ jobs:
       Python36:
         TOXENV: 'py36'
         python.version: '3.6'
-      Python37:
-        TOXENV: 'py37'
-        python.version: '3.7'
+      # There's a crash on Windows with Python 3.7, looking similar to what happens on macOS
+      # Python37:
+      #   TOXENV: 'py37'
+      #   python.version: '3.7'
       pre-commit:
         TOXENV: 'pre-commit'
         python.version: '3.6'
