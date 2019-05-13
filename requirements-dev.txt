@@ -1,6 +1,6 @@
 bottle
 bravado-core>=4.11.0
-bravado[integration-tests]>=10.1.0
+bravado[integration-tests]>=10.4.1
 coverage
 ephemeral_port_reserve
 mock
