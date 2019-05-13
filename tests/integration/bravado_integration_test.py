@@ -27,7 +27,8 @@ class TestServerBravadoAsyncioClient(IntegrationTestsBaseClass):
             'method': 'GET',
             'headers': {'byte-header': b'1'},
             'url': '{server_address}/1'.format(server_address=swagger_http_server),
-            'params': {},
-        }).result(timeout=1)
+            # setting high timeouts here so we don't get coverage errors on Windows on Azure Pipelines
+            'params': {'timeout': 5, 'connect_timeout': 1},
+        }).result(timeout=5)
 
         assert response.text == self.encode_expected_response(ROUTE_1_RESPONSE)
