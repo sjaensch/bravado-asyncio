@@ -17,6 +17,8 @@ def get_thread_loop() -> asyncio.AbstractEventLoop:
     global event_loop
     if event_loop is None:
         event_loop = asyncio.new_event_loop()
-        thread = threading.Thread(target=run_event_loop, args=(event_loop,), daemon=True)
+        thread = threading.Thread(
+            target=run_event_loop, args=(event_loop,), daemon=True
+        )
         thread.start()
     return event_loop

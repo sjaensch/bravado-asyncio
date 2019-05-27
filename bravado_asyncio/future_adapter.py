@@ -11,9 +11,10 @@ from bravado_asyncio.definitions import AsyncioResponse
 
 
 class BaseFutureAdapter(BravadoFutureAdapter):
-
     def __init__(self, future: Any) -> None:
-        raise NotImplementedError('Do not instantiate BaseFutureAdapter, use one of its subclasses')
+        raise NotImplementedError(
+            "Do not instantiate BaseFutureAdapter, use one of its subclasses"
+        )
 
 
 class FutureAdapter(BaseFutureAdapter):
