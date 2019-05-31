@@ -12,33 +12,37 @@ from bravado_asyncio.future_adapter import FutureAdapter
 
 @pytest.fixture
 def mock_future():
-    return mock.Mock(name='future')
+    return mock.Mock(name="future")
 
 
 @pytest.fixture
 def mock_response():
-    return mock.Mock(name='response')
+    return mock.Mock(name="response")
 
 
 @pytest.fixture
 def mock_wait_for():
-    with mock.patch('bravado_asyncio.future_adapter.asyncio.wait_for') as _mock:
+    with mock.patch("bravado_asyncio.future_adapter.asyncio.wait_for") as _mock:
         yield _mock
 
 
 def mock_result_with_sleep(response):
     """Return a function that can be used as side effect for mock_future.result, adding in a delay."""
+
     def _side_effect(timeout=None):
         time.sleep(0.1)
         return response
+
     return _side_effect
 
 
 def mock_wait_for_result_with_sleep(response):
     """Return a function that can be used as side effect for mock_wait_for, adding in a delay."""
+
     def _side_effect(future, timeout=None):
         time.sleep(0.1)
         return asyncio.coroutine(lambda: response)()
+
     return _side_effect
 
 

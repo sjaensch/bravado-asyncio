@@ -95,7 +95,9 @@ class AsyncioClient(HttpClient):
             self.bravado_future_class = AsyncioHttpFuture
             self.future_adapter = AsyncioFutureAdapter
         else:
-            raise ValueError('Don\'t know how to handle run mode {}'.format(str(run_mode)))
+            raise ValueError(
+                "Don't know how to handle run mode {}".format(str(run_mode))
+            )
 
         # don't use the shared client_session if we've been passed an explicit loop argument
         if loop:
@@ -110,7 +112,9 @@ class AsyncioClient(HttpClient):
             cafile = None
             if isinstance(ssl_verify, str):
                 cafile = ssl_verify
-            self.ssl_context = ssl.create_default_context(cafile=cafile)  # type: Optional[ssl.SSLContext]
+            self.ssl_context = ssl.create_default_context(
+                cafile=cafile
+            )  # type: Optional[ssl.SSLContext]
             if ssl_cert:
                 if isinstance(ssl_cert, str):
                     ssl_cert = [ssl_cert]
@@ -137,43 +141,50 @@ class AsyncioClient(HttpClient):
         :rtype: :class: `bravado_core.http_future.HttpFuture`
         """
 
-        orig_data = request_params.get('data', {})
+        orig_data = request_params.get("data", {})
         if isinstance(orig_data, Mapping):
             data = FormData()
             for name, value in orig_data.items():
-                str_value = str(value) if not is_list_like(value) else [str(v) for v in value]
+                str_value = (
+                    str(value) if not is_list_like(value) else [str(v) for v in value]
+                )
                 data.add_field(name, str_value)
         else:
             data = orig_data
 
         if isinstance(data, FormData):
-            for name, file_tuple in request_params.get('files', {}):
+            for name, file_tuple in request_params.get("files", {}):
                 stream_obj = file_tuple[1]
                 data.add_field(name, stream_obj, filename=file_tuple[0])
 
-        params = self.prepare_params(request_params.get('params'))
+        params = self.prepare_params(request_params.get("params"))
 
-        connect_timeout = request_params.get('connect_timeout')  # type: Optional[float]
-        request_timeout = request_params.get('timeout')  # type: Optional[float]
+        connect_timeout = request_params.get("connect_timeout")  # type: Optional[float]
+        request_timeout = request_params.get("timeout")  # type: Optional[float]
         # mypy thinks the type of total and connect is float, even though it is Optional[float]. Let's ignore the error.
-        timeout = aiohttp.ClientTimeout(
-            total=request_timeout,
-            connect=connect_timeout,
-        ) if (connect_timeout or request_timeout) else None
+        timeout = (
+            aiohttp.ClientTimeout(total=request_timeout, connect=connect_timeout)
+            if (connect_timeout or request_timeout)
+            else None
+        )
 
         # aiohttp always adds a Content-Type header, and this breaks some servers that don't
         # expect it for non-POST/PUT requests: https://github.com/aio-libs/aiohttp/issues/457
-        skip_auto_headers = ['Content-Type'] if request_params.get('method') not in ['POST', 'PUT'] else None
+        skip_auto_headers = (
+            ["Content-Type"]
+            if request_params.get("method") not in ["POST", "PUT"]
+            else None
+        )
 
         coroutine = self.client_session.request(
-            method=request_params.get('method') or 'GET',
-            url=cast(str, request_params.get('url', '')),
+            method=request_params.get("method") or "GET",
+            url=cast(str, request_params.get("url", "")),
             params=params,
             data=data,
             headers={
                 # Convert not string headers to string
                 k: from_bytes(v) if isinstance(v, bytes) else str(v)
-                for k, v in request_params.get('headers', {}).items()
+                for k, v in request_params.get("headers", {}).items()
             },
             skip_auto_headers=skip_auto_headers,
             timeout=timeout,
@@ -189,17 +200,21 @@ class AsyncioClient(HttpClient):
             request_config=request_config,
         )
 
-    def prepare_params(self, params: Optional[Dict[str, Any]]) -> Union[Optional[Dict[str, Any]], MultiDict]:
+    def prepare_params(
+        self, params: Optional[Dict[str, Any]]
+    ) -> Union[Optional[Dict[str, Any]], MultiDict]:
         if not params:
             return params
 
         items = []
         for key, value in params.items():
-            entries = [(key, str(value))] if not is_list_like(value) else [(key, str(v)) for v in value]
+            entries = (
+                [(key, str(value))]
+                if not is_list_like(value)
+                else [(key, str(v)) for v in value]
+            )
             items.extend(entries)
         return MultiDict(items)
 
     def _get_ssl_params(self) -> Dict[str, Any]:
-        return {
-            'ssl': self.ssl_context if self.ssl_context else self.ssl_verify
-        }
+        return {"ssl": self.ssl_context if self.ssl_context else self.ssl_verify}

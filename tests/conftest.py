@@ -15,9 +15,9 @@ def event_loop():
 
 @pytest.fixture
 def mock_loop():
-    return mock.Mock(name='loop')
+    return mock.Mock(name="loop")
 
 
-@pytest.fixture(autouse=True, scope='session')
+@pytest.fixture(autouse=True, scope="session")
 def set_log_level():
     logging.basicConfig(level=logging.DEBUG)

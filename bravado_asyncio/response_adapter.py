@@ -10,7 +10,7 @@ from multidict import CIMultiDict
 from bravado_asyncio.definitions import AsyncioResponse
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class AioHTTPResponseAdapter(IncomingResponse):
@@ -41,7 +41,9 @@ class AioHTTPResponseAdapter(IncomingResponse):
 
     @property
     def reason(self) -> str:
-        return cast(str, self._delegate.reason)  # aiohttp 3.4.0 doesn't annotate this attribute correctly
+        return cast(
+            str, self._delegate.reason
+        )  # aiohttp 3.4.0 doesn't annotate this attribute correctly
 
     @property
     def headers(self) -> CIMultiDict:
@@ -58,11 +60,17 @@ class AsyncioHTTPResponseAdapter(AioHTTPResponseAdapter):
 
     @property
     async def text(self) -> str:  # type: ignore
-        return await asyncio.wait_for(self._delegate.text(), timeout=self._remaining_timeout, loop=self._loop)
+        return await asyncio.wait_for(
+            self._delegate.text(), timeout=self._remaining_timeout, loop=self._loop
+        )
 
     @property
     async def raw_bytes(self) -> bytes:  # type: ignore
-        return await asyncio.wait_for(self._delegate.read(), timeout=self._remaining_timeout, loop=self._loop)
+        return await asyncio.wait_for(
+            self._delegate.read(), timeout=self._remaining_timeout, loop=self._loop
+        )
 
     async def json(self, **_: Any) -> Dict[str, Any]:  # type: ignore
-        return await asyncio.wait_for(self._delegate.json(), timeout=self._remaining_timeout, loop=self._loop)
+        return await asyncio.wait_for(
+            self._delegate.json(), timeout=self._remaining_timeout, loop=self._loop
+        )
