@@ -125,11 +125,11 @@ class AsyncioClient(HttpClient):
     def loop(self) -> asyncio.AbstractEventLoop:
         if self._loop is not None:
             return self._loop
-        elif self.run_mode == RunMode.FULL_ASYNCIO:
-            return asyncio.get_event_loop()
         elif self.run_mode == RunMode.THREAD:
             return get_thread_loop()
-        else:
+        elif self.run_mode == RunMode.FULL_ASYNCIO:
+            return asyncio.get_event_loop()
+        else:  # pragma: no cover
             # should be impossible because this is validated by __init__
             raise ValueError(self.run_mode)
 
