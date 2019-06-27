@@ -1,6 +1,10 @@
 Changelog
 =========
 
+1.4.2 (2019-06-27)
+------------------
+- Lazily initialize the event loop thread and the aiohttp ClientSession object, making sure this happens post-fork - PR #34
+
 1.4.1 (2019-04-26)
 ------------------
 - Add support for HttpFuture.cancel() from bravado 10.3.0 - PR #27
