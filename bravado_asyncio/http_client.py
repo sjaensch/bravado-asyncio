@@ -80,8 +80,8 @@ class AsyncioClient(HttpClient):
             and key.
         """
         self.run_mode = run_mode
+        self._loop = loop
         if self.run_mode == RunMode.THREAD:
-            self.loop = loop or get_thread_loop()
             self.run_coroutine_func = asyncio.run_coroutine_threadsafe  # type: Callable
             self.response_adapter = AioHTTPResponseAdapter
             self.bravado_future_class = HttpFuture
@@ -89,7 +89,6 @@ class AsyncioClient(HttpClient):
         elif run_mode == RunMode.FULL_ASYNCIO:
             from aiobravado.http_future import HttpFuture as AsyncioHttpFuture
 
-            self.loop = loop or asyncio.get_event_loop()
             self.run_coroutine_func = asyncio.ensure_future
             self.response_adapter = AsyncioHTTPResponseAdapter
             self.bravado_future_class = AsyncioHttpFuture
@@ -99,11 +98,10 @@ class AsyncioClient(HttpClient):
                 "Don't know how to handle run mode {}".format(str(run_mode))
             )
 
+        self._client_session = None
         # don't use the shared client_session if we've been passed an explicit loop argument
         if loop:
-            self.client_session = aiohttp.ClientSession(loop=loop)
-        else:
-            self.client_session = get_client_session(self.loop)
+            self._client_session = aiohttp.ClientSession(loop=loop)
 
         # translate the requests-type SSL options to a ssl.SSLContext object as used by aiohttp.
         # see https://aiohttp.readthedocs.io/en/stable/client_advanced.html#ssl-control-for-tcp-sockets
@@ -122,6 +120,25 @@ class AsyncioClient(HttpClient):
         else:
             self.ssl_verify = ssl_verify
             self.ssl_context = None
+
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        if self._loop is not None:
+            return self._loop
+        elif self.run_mode == RunMode.THREAD:
+            return get_thread_loop()
+        elif self.run_mode == RunMode.FULL_ASYNCIO:
+            return asyncio.get_event_loop()
+        else:  # pragma: no cover
+            # should be impossible because this is validated by __init__
+            raise ValueError(self.run_mode)
+
+    @property
+    def client_session(self) -> aiohttp.ClientSession:
+        if self._client_session is not None:
+            return self._client_session
+        else:
+            return get_client_session(self.loop)
 
     def request(
         self,
