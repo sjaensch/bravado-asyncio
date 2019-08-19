@@ -5,7 +5,7 @@ coverage
 ephemeral_port_reserve
 mock
 mypy
-pytest
+pytest<5.1  # fix Python 3.5 coverage reporting issue
 tox
 tox-pip-extensions
 u-msgpack-python
