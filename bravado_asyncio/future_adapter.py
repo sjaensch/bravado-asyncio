@@ -4,6 +4,7 @@ import time
 from typing import Any
 from typing import Optional
 
+import aiohttp
 import aiohttp.client_exceptions
 from bravado.http_future import FutureAdapter as BravadoFutureAdapter
 
@@ -51,7 +52,9 @@ class AsyncioFutureAdapter(BaseFutureAdapter):
 
     async def result(self, timeout: Optional[float] = None) -> AsyncioResponse:
         start = time.monotonic()
-        response = await asyncio.wait_for(self.future, timeout=timeout)
+        response = await asyncio.wait_for(
+            self.future, timeout=timeout
+        )  # type: aiohttp.ClientResponse
         time_elapsed = time.monotonic() - start
         remaining_timeout = timeout - time_elapsed if timeout else None
 
