@@ -4,7 +4,6 @@ import time
 from typing import Any
 from typing import Optional
 
-import aiohttp
 import aiohttp.client_exceptions
 from bravado.http_future import FutureAdapter as BravadoFutureAdapter
 
