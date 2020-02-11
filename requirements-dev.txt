@@ -4,7 +4,7 @@ bravado-core>=4.11.0
 bravado[integration-tests]>=10.4.1
 coverage
 ephemeral_port_reserve
-mock
+mock<4
 mypy
 pytest<5.1  # fix Python 3.5 coverage reporting issue
 tox
