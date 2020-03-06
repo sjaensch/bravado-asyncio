@@ -34,5 +34,9 @@ class TestServerBravadoAsyncioClient(IntegrationTestsBaseClass):
         assert response.text == self.encode_expected_response(ROUTE_1_RESPONSE)
 
     @pytest.mark.xfail(reason="Test started failing")
-    def test_request_timeout_errors_are_thrown_as_BravadoTimeoutError(self, swagger_http_server):
-        super().test_request_timeout_errors_are_thrown_as_BravadoTimeoutError(swagger_http_server)
+    def test_request_timeout_errors_are_thrown_as_BravadoTimeoutError(
+        self, swagger_http_server
+    ):
+        super().test_request_timeout_errors_are_thrown_as_BravadoTimeoutError(
+            swagger_http_server
+        )
