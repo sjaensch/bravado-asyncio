@@ -30,7 +30,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
     ],
-    install_requires=["aiohttp>=3.3", "bravado>=10.3.0", "yelp-bytes", "swagger-spec-validator<2.5"],
+    install_requires=["aiohttp>=3.3", "bravado>=10.3.0", "yelp-bytes"],
     extras_require={
         # as recommended by aiohttp, see http://aiohttp.readthedocs.io/en/stable/#library-installation
         "aiohttp_extras": ["aiodns", "cchardet"],
