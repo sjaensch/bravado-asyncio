@@ -280,10 +280,9 @@ def test_time_until_request_done(integration_server):
 
     bravado_future.response(timeout=1)
 
-    assert time_waited < 0.2, (
-        f"Waited {wait_request_received_time}s for request to be received by server,"
-        "shm value is now f{shm_request_received.value}"
-    )
+    assert time_waited < 0.2, "Waited {}s for request to be received by server,".format(
+        wait_request_received_time
+    ) + "shm value is now {}".format(shm_request_received.value)
 
 
 @pytest.mark.xfail(
