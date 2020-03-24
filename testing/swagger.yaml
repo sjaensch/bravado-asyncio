@@ -265,6 +265,18 @@ paths:
               description: "date in UTC when token expires"
         400:
           description: "Invalid username/password supplied"
+  /ping:
+    get:
+      tags:
+        - "ping"
+      summary: "Send a ping to the server"
+      description: ""
+      operationId: "ping"
+      produces:
+      - "application/json"
+      responses:
+          200:
+            description: "successful operation"
 definitions:
   Category:
     type: "object"
