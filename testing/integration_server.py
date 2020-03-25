@@ -1,10 +1,14 @@
 import argparse
 import asyncio
+import multiprocessing
 import os.path
 import sys
 
 import umsgpack
 from aiohttp import web
+
+
+shm_request_received = None
 
 
 async def swagger_spec(request):
@@ -130,6 +134,11 @@ async def get_pets(request):
     return web.json_response(pets)
 
 
+async def ping(request):
+    shm_request_received.value = 1
+    return web.json_response({})
+
+
 def check_content_type(headers, expected_content_type):
     content_type = headers.get("Content-Type")
     if content_type != expected_content_type:
@@ -152,6 +161,15 @@ def setup_routes(app):
     app.router.add_put("/pet", update_pet)
     app.router.add_delete("/pet", delete_pet)
     app.router.add_get("/pets", get_pets)
+    app.router.add_get("/ping", ping)
+
+
+def start_integration_server(port, shm_request_received_var):
+    global shm_request_received
+    shm_request_received = shm_request_received_var
+    app = web.Application()
+    setup_routes(app)
+    web.run_app(app, host="127.0.0.1", port=port)
 
 
 if __name__ == "__main__":
@@ -166,6 +184,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    app = web.Application()
-    setup_routes(app)
-    web.run_app(app, host="127.0.0.1", port=args.port)
+    start_integration_server(args.port, multiprocessing.Value("i", 0))

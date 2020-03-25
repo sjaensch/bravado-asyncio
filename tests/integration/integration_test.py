@@ -1,10 +1,14 @@
 import asyncio
 import io
+import multiprocessing
 import os.path
 import time
+import urllib
 from asyncio import run_coroutine_threadsafe
 from concurrent.futures import CancelledError
 
+import ephemeral_port_reserve
+import monotonic
 import pytest
 from bravado import requests_client
 from bravado.client import SwaggerClient
@@ -16,6 +20,40 @@ from bravado_core.model import Model
 
 from bravado_asyncio import http_client
 from bravado_asyncio import thread_loop
+from testing.integration_server import start_integration_server
+
+
+shm_request_received = None
+
+
+def wait_unit_service_starts(url, timeout=10):
+    start = time.time()
+    while time.time() < start + timeout:
+        try:
+            urllib.request.urlopen(url, timeout=2)
+        except urllib.error.HTTPError:  # pragma: no cover
+            return
+        except urllib.error.URLError:  # pragma: no cover
+            time.sleep(0.1)
+
+
+@pytest.fixture(scope="module")
+def integration_server():
+    global shm_request_received
+    shm_request_received = multiprocessing.Value("i", 0, lock=False)
+
+    server_port = ephemeral_port_reserve.reserve()
+    server_process = multiprocessing.Process(
+        target=start_integration_server, args=(server_port, shm_request_received)
+    )
+    server_process.daemon = True
+    server_process.start()
+    wait_unit_service_starts("http://localhost:{port}".format(port=server_port))
+
+    yield "http://localhost:{}".format(server_port)
+
+    server_process.terminate()
+    server_process.join(timeout=1)
 
 
 @pytest.fixture(
@@ -228,6 +266,23 @@ def test_timeout_on_future(swagger_client):
 
     # make sure the exception doesn't disrupt the other request
     assert isinstance(other_future.response(timeout=1).result, Model)
+
+
+def test_time_until_request_done(integration_server):
+    swagger_client = get_swagger_client(integration_server, http_client.AsyncioClient())
+    start_time = monotonic.monotonic()
+    bravado_future = swagger_client.ping.ping()
+    time_waited = 0
+    while not shm_request_received.value and time_waited < 1:
+        time.sleep(0.01)
+        time_waited += 0.01
+    wait_request_received_time = monotonic.monotonic() - start_time
+
+    bravado_future.response(timeout=1)
+
+    assert time_waited < 0.2, "Waited {}s for request to be received by server,".format(
+        wait_request_received_time
+    ) + "shm value is now {}".format(shm_request_received.value)
 
 
 @pytest.mark.xfail(
