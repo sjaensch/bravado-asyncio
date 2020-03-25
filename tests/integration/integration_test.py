@@ -46,7 +46,7 @@ def integration_server():
     server_process = multiprocessing.Process(
         target=start_integration_server, args=(server_port, shm_request_received)
     )
-    # server_process.daemon = True
+    server_process.daemon = True
     server_process.start()
     wait_unit_service_starts("http://localhost:{port}".format(port=server_port))
 
