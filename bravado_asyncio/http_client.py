@@ -185,6 +185,8 @@ class AsyncioClient(HttpClient):
             else None
         )
 
+        follow_redirects = request_params.get("follow_redirects", False)
+
         # aiohttp always adds a Content-Type header, and this breaks some servers that don't
         # expect it for non-POST/PUT requests: https://github.com/aio-libs/aiohttp/issues/457
         skip_auto_headers = (
@@ -203,6 +205,7 @@ class AsyncioClient(HttpClient):
                 k: from_bytes(v) if isinstance(v, bytes) else str(v)
                 for k, v in request_params.get("headers", {}).items()
             },
+            allow_redirects=follow_redirects,
             skip_auto_headers=skip_auto_headers,
             timeout=timeout,
             **self._get_ssl_params()
