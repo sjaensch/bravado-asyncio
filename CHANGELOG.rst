@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.5.0 (2020-03-31)
+------------------
+- | Implement support for request option ``follow_redirects``, disable following redirects by default - PR #41
+  | While this is a behavior change, it matches what bravado's default HTTP client does starting with version 10.6.0, and is considered a bugfix.
+
 1.4.2 (2019-06-27)
 ------------------
 - Lazily initialize the event loop thread and the aiohttp ClientSession object, making sure this happens post-fork - PR #34
