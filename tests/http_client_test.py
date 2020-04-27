@@ -7,8 +7,8 @@ from bravado.http_future import HttpFuture
 
 from bravado_asyncio.future_adapter import FutureAdapter
 from bravado_asyncio.http_client import AsyncioClient
-from bravado_asyncio.http_client import RunMode
 from bravado_asyncio.http_client import get_client_session
+from bravado_asyncio.http_client import RunMode
 from bravado_asyncio.response_adapter import AioHTTPResponseAdapter
 
 
@@ -58,8 +58,8 @@ def test_fail_on_unknown_run_mode():
 
 def test_get_client_session(mock_client_session):
     """Make sure get_client_session caches client sessions per loop."""
-    loop1 = mock.Mock(name='loop1', spec=asyncio.AbstractEventLoop)
-    loop2 = mock.Mock(name='loop2', spec=asyncio.AbstractEventLoop)
+    loop1 = mock.Mock(name="loop1", spec=asyncio.AbstractEventLoop)
+    loop2 = mock.Mock(name="loop2", spec=asyncio.AbstractEventLoop)
 
     mock_client_session.side_effect = [mock.sentinel.session1, mock.sentinel.session2]
 
