@@ -297,9 +297,9 @@ def test_client_from_asyncio(integration_server):
     # this is important since we measure the time this test takes, and the test_timeout() tasks might
     # interfere with it
     loop = thread_loop.get_thread_loop()
-    if http_client.client_session:
-        run_coroutine_threadsafe(http_client.client_session.close(), loop)
-    http_client.client_session = None
+    if hasattr(loop, '_bravado_asyncio_client_session'):
+        run_coroutine_threadsafe(loop._bravado_asyncio_client_session.close(), loop)
+        del loop._bravado_asyncio_client_session
     # not going to properly shut down the running loop, this will be cleaned up on exit
     thread_loop.event_loop = None
 

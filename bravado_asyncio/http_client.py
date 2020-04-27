@@ -42,10 +42,10 @@ def get_client_session(loop: asyncio.AbstractEventLoop) -> aiohttp.ClientSession
     :return: a ClientSession instance that can be used to do HTTP requests
     """
     try:
-        return loop._bravado_asyncio_client_session
+        return loop._bravado_asyncio_client_session  # type: ignore
     except AttributeError:
         client_session = aiohttp.ClientSession(loop=loop)
-        loop._bravado_asyncio_client_session = client_session
+        loop._bravado_asyncio_client_session = client_session  # type: ignore
         return client_session
 
 
