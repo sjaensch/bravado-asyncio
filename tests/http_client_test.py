@@ -8,6 +8,7 @@ from bravado.http_future import HttpFuture
 from bravado_asyncio.future_adapter import FutureAdapter
 from bravado_asyncio.http_client import AsyncioClient
 from bravado_asyncio.http_client import RunMode
+from bravado_asyncio.http_client import get_client_session
 from bravado_asyncio.response_adapter import AioHTTPResponseAdapter
 
 
@@ -53,6 +54,28 @@ def mock_create_default_context():
 def test_fail_on_unknown_run_mode():
     with pytest.raises(ValueError):
         AsyncioClient(run_mode="unknown/invalid")
+
+
+def test_get_client_session(mock_client_session):
+    """Make sure get_client_session caches client sessions per loop."""
+    loop1 = mock.Mock(name='loop1', spec=asyncio.AbstractEventLoop)
+    loop2 = mock.Mock(name='loop2', spec=asyncio.AbstractEventLoop)
+
+    mock_client_session.side_effect = [mock.sentinel.session1, mock.sentinel.session2]
+
+    s1 = get_client_session(loop1)
+    s2 = get_client_session(loop2)
+    s3 = get_client_session(loop1)
+
+    mock_client_session.assert_has_calls([mock.call(loop=loop1), mock.call(loop=loop2)])
+    assert mock_client_session.call_count == 2
+
+    assert loop1._bravado_asyncio_client_session == mock.sentinel.session1
+    assert loop2._bravado_asyncio_client_session == mock.sentinel.session2
+
+    assert s1 == mock.sentinel.session1
+    assert s2 == mock.sentinel.session2
+    assert s3 == s1
 
 
 @pytest.mark.usefixtures("mock_aiohttp_version")

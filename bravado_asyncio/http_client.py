@@ -34,12 +34,6 @@ from bravado_asyncio.thread_loop import get_thread_loop
 log = logging.getLogger(__name__)
 
 
-#: module variable holding the current :class:`aiohttp.ClientSession`, so that we can share it between
-#: :class:`AsyncioClient` instances. Use :func:`get_client_session` to retrieve it and create one if none
-#: is present.
-client_session = None  # type: Optional[aiohttp.ClientSession]
-
-
 def get_client_session(loop: asyncio.AbstractEventLoop) -> aiohttp.ClientSession:
     """Get a shared ClientSession object that can be reused. If none exists yet it will
     create one using the passed-in loop.
@@ -47,11 +41,12 @@ def get_client_session(loop: asyncio.AbstractEventLoop) -> aiohttp.ClientSession
     :param loop: an active (i.e. not closed) asyncio event loop
     :return: a ClientSession instance that can be used to do HTTP requests
     """
-    global client_session
-    if client_session:
+    try:
+        return loop._bravado_asyncio_client_session
+    except AttributeError:
+        client_session = aiohttp.ClientSession(loop=loop)
+        loop._bravado_asyncio_client_session = client_session
         return client_session
-    client_session = aiohttp.ClientSession(loop=loop)
-    return client_session
 
 
 class AsyncioClient(HttpClient):
