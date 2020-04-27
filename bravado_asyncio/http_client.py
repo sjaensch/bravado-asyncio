@@ -93,11 +93,6 @@ class AsyncioClient(HttpClient):
                 "Don't know how to handle run mode {}".format(str(run_mode))
             )
 
-        self._client_session = None
-        # don't use the shared client_session if we've been passed an explicit loop argument
-        if loop:
-            self._client_session = aiohttp.ClientSession(loop=loop)
-
         # translate the requests-type SSL options to a ssl.SSLContext object as used by aiohttp.
         # see https://aiohttp.readthedocs.io/en/stable/client_advanced.html#ssl-control-for-tcp-sockets
         if isinstance(ssl_verify, str) or ssl_cert:
@@ -130,10 +125,7 @@ class AsyncioClient(HttpClient):
 
     @property
     def client_session(self) -> aiohttp.ClientSession:
-        if self._client_session is not None:
-            return self._client_session
-        else:
-            return get_client_session(self.loop)
+        return get_client_session(self.loop)
 
     def request(
         self,
