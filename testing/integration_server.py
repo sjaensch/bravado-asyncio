@@ -8,6 +8,8 @@ import umsgpack
 from aiohttp import web
 
 
+INTEGRATION_SERVER_HOST = "127.0.0.1"
+
 shm_request_received = None
 
 
@@ -165,11 +167,11 @@ def setup_routes(app):
 
 
 def start_integration_server(port, shm_request_received_var):
-    global shm_request_received
+    global shm_request_received, INTEGRATION_SERVER_HOST
     shm_request_received = shm_request_received_var
     app = web.Application()
     setup_routes(app)
-    web.run_app(app, host="127.0.0.1", port=port)
+    web.run_app(app, host=INTEGRATION_SERVER_HOST, port=port)
 
 
 if __name__ == "__main__":
