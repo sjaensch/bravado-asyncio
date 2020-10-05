@@ -9,11 +9,11 @@ from bravado_asyncio.future_adapter import FutureAdapter
 from bravado_asyncio.http_client import AsyncioClient
 
 
-@pytest.mark.xfail(
+@pytest.mark.skipif(
     sys.platform != "linux" or sys.version_info >= (3, 7),
     reason="These integration tests are failing on newer Python versions due to trying to connect to ::1 first, and failing. On Windows, they run into timeouts",
 )
-class TestServerBravadoAsyncioClient(IntegrationTestsBaseClass):
+class TestServerBravadoAsyncioClient(IntegrationTestsBaseClass):  # pragma: no cover
 
     http_client_type = AsyncioClient
     http_future_adapter_type = FutureAdapter
@@ -34,11 +34,3 @@ class TestServerBravadoAsyncioClient(IntegrationTestsBaseClass):
         assert response.text == self.encode_expected_response(
             ROUTE_1_RESPONSE
         )  # pragma: no cover
-
-    @pytest.mark.xfail(reason="Test started failing")
-    def test_request_timeout_errors_are_thrown_as_BravadoTimeoutError(
-        self, swagger_http_server
-    ):
-        super().test_request_timeout_errors_are_thrown_as_BravadoTimeoutError(
-            swagger_http_server
-        )
