@@ -1,3 +1,5 @@
+import sys
+
 import aiohttp.client_exceptions
 import pytest
 from bravado.testing.integration_test import IntegrationTestsBaseClass
@@ -36,3 +38,27 @@ class TestServerBravadoAsyncioClient(IntegrationTestsBaseClass):
         self, swagger_http_server
     ):  # pragma: no cover
         pass
+
+    @pytest.mark.skipif(
+        sys.platform == "win32",
+        reason="Test does not throw correct exception type on Windows",
+    )
+    def test_connection_errors_are_thrown_as_BravadoConnectionError(
+        self, not_answering_http_server
+    ):  # pragma: no cover
+        return super().test_connection_errors_are_thrown_as_BravadoConnectionError(
+            not_answering_http_server
+        )
+
+    @pytest.mark.skipif(
+        sys.platform == "win32",
+        reason="Test does not throw correct exception type on Windows",
+    )
+    def test_swagger_client_connection_errors_are_thrown_as_BravadoConnectionError(
+        self, not_answering_http_server, swagger_client, result_getter,
+    ):  # pragma: no cover
+        return super().test_swagger_client_connection_errors_are_thrown_as_BravadoConnectionError(
+            not_answering_http_server=not_answering_http_server,
+            swagger_client=swagger_client,
+            result_getter=result_getter,
+        )
