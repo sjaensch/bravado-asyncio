@@ -1,11 +1,11 @@
 """Module for creating a separate thread with an asyncio event loop running inside it."""
 import asyncio
 import threading
-from typing import Optional  # noqa
+from typing import Optional
 
 
 # module variable holding a reference to the event loop
-event_loop = None  # type: Optional[asyncio.AbstractEventLoop]
+event_loop: Optional[asyncio.AbstractEventLoop] = None
 
 
 def run_event_loop(loop: asyncio.AbstractEventLoop) -> None:
