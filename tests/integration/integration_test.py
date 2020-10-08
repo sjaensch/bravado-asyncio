@@ -20,6 +20,7 @@ from bravado_core.model import Model
 
 from bravado_asyncio import http_client
 from bravado_asyncio import thread_loop
+from testing.integration_server import INTEGRATION_SERVER_HOST
 from testing.integration_server import start_integration_server
 
 
@@ -30,7 +31,7 @@ def wait_unit_service_starts(url, timeout=10):
     start = time.time()
     while time.time() < start + timeout:
         try:
-            urllib.request.urlopen(url, timeout=2)
+            urllib.request.urlopen(url, timeout=timeout)
         except urllib.error.HTTPError:  # pragma: no cover
             return
         except urllib.error.URLError:  # pragma: no cover
@@ -48,9 +49,12 @@ def integration_server():
     )
     server_process.daemon = True
     server_process.start()
-    wait_unit_service_starts("http://localhost:{port}".format(port=server_port))
+    server_url = "http://{host}:{port}".format(
+        host=INTEGRATION_SERVER_HOST, port=server_port
+    )
+    wait_unit_service_starts(server_url)
 
-    yield "http://localhost:{}".format(server_port)
+    yield server_url
 
     server_process.terminate()
     server_process.join(timeout=1)
@@ -329,10 +333,7 @@ async def _test_asyncio_client(integration_server):
     # schedule our first coroutine (after _test_asyncio_client) in the default event loop
     future = asyncio.ensure_future(sleep_coroutine())
     client1 = get_swagger_client(integration_server, http_client.AsyncioClient())
-    client2 = get_swagger_client(
-        integration_server.replace("localhost", "127.0.0.1"),
-        http_client.AsyncioClient(),
-    )
+    client2 = get_swagger_client(integration_server, http_client.AsyncioClient(),)
 
     # two tasks for the event loop running in a separate thread
     future1 = client1.store.getInventory()

@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import ssl
-from collections import Mapping
+from collections.abc import Mapping
 from typing import Any
 from typing import Callable  # noqa: F401
 from typing import cast
