@@ -1,5 +1,10 @@
 Changelog
 =========
+2.0.0 (2020-10-09)
+------------------
+- Cache aiohttp client session on the loop, not globally - PR #42. Thanks Nick Gaya for your contribution!
+- Remove support for Python 3.5 - PR #45
+- Add support for Python 3.8 - PR #46
 
 1.5.0 (2020-03-31)
 ------------------
