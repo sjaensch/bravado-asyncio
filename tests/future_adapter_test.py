@@ -1,6 +1,5 @@
 import asyncio
 import concurrent.futures
-import sys
 import time
 
 import mock
@@ -58,13 +57,9 @@ def test_future_adapter(mock_future, mock_response):
     assert 0 < result.remaining_timeout < 5
 
 
-@pytest.mark.skipif(
-    sys.version_info >= (3, 8),
-    reason="This does not seem to hold true for Python 3.8+ anymore",
-)
 def test_future_adapter_timeout_error_class():
     """Let's make sure refactors never break timeout errors"""
-    assert concurrent.futures.TimeoutError in AsyncioFutureAdapter.timeout_errors
+    assert concurrent.futures.TimeoutError in FutureAdapter.timeout_errors
 
 
 def test_asyncio_future_adapter(mock_future, mock_wait_for, mock_response, event_loop):

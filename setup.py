@@ -28,6 +28,7 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     install_requires=["aiohttp>=3.3", "bravado>=11.0.0", "yelp-bytes"],
     extras_require={
