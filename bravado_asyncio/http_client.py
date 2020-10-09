@@ -3,7 +3,7 @@ import logging
 import ssl
 from collections.abc import Mapping
 from typing import Any
-from typing import Callable  # noqa: F401
+from typing import Callable
 from typing import cast
 from typing import Dict
 from typing import MutableMapping
@@ -14,7 +14,6 @@ from typing import Union
 
 import aiohttp
 from aiohttp.formdata import FormData
-from bravado import http_future  # noqa
 from bravado.config import RequestConfig
 from bravado.http_client import HttpClient
 from bravado.http_future import HttpFuture
@@ -77,10 +76,10 @@ class AsyncioClient(HttpClient):
         self.run_mode = run_mode
         self._loop = loop
         if self.run_mode == RunMode.THREAD:
-            self.run_coroutine_func = asyncio.run_coroutine_threadsafe  # type: Callable
+            self.run_coroutine_func: Callable = asyncio.run_coroutine_threadsafe
             self.response_adapter = AioHTTPResponseAdapter
             self.bravado_future_class = HttpFuture
-            self.future_adapter = FutureAdapter  # type: Type[BaseFutureAdapter]
+            self.future_adapter: Type[BaseFutureAdapter] = FutureAdapter
         elif run_mode == RunMode.FULL_ASYNCIO:
             from aiobravado.http_future import HttpFuture as AsyncioHttpFuture
 
@@ -96,13 +95,13 @@ class AsyncioClient(HttpClient):
         # translate the requests-type SSL options to a ssl.SSLContext object as used by aiohttp.
         # see https://aiohttp.readthedocs.io/en/stable/client_advanced.html#ssl-control-for-tcp-sockets
         if isinstance(ssl_verify, str) or ssl_cert:
-            self.ssl_verify = None  # type: Optional[bool]
+            self.ssl_verify: Optional[bool] = None
             cafile = None
             if isinstance(ssl_verify, str):
                 cafile = ssl_verify
-            self.ssl_context = ssl.create_default_context(
+            self.ssl_context: Optional[ssl.SSLContext] = ssl.create_default_context(
                 cafile=cafile
-            )  # type: Optional[ssl.SSLContext]
+            )
             if ssl_cert:
                 if isinstance(ssl_cert, str):
                     ssl_cert = [ssl_cert]
@@ -163,8 +162,8 @@ class AsyncioClient(HttpClient):
 
         params = self.prepare_params(request_params.get("params"))
 
-        connect_timeout = request_params.get("connect_timeout")  # type: Optional[float]
-        request_timeout = request_params.get("timeout")  # type: Optional[float]
+        connect_timeout: Optional[float] = request_params.get("connect_timeout")
+        request_timeout: Optional[float] = request_params.get("timeout")
         # mypy thinks the type of total and connect is float, even though it is Optional[float]. Let's ignore the error.
         timeout = (
             aiohttp.ClientTimeout(total=request_timeout, connect=connect_timeout)
