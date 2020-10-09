@@ -10,7 +10,6 @@ class RunMode(Enum):
     FULL_ASYNCIO = "full_asyncio"
 
 
-AsyncioResponse = NamedTuple(
-    "AsyncioResponse",
-    [("response", aiohttp.ClientResponse), ("remaining_timeout", Optional[float])],
-)
+class AsyncioResponse(NamedTuple):
+    response: aiohttp.ClientResponse
+    remaining_timeout: Optional[float]

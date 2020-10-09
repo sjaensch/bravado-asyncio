@@ -51,9 +51,9 @@ class AsyncioFutureAdapter(BaseFutureAdapter):
 
     async def result(self, timeout: Optional[float] = None) -> AsyncioResponse:
         start = time.monotonic()
-        response = await asyncio.wait_for(
+        response: aiohttp.ClientResponse = await asyncio.wait_for(
             self.future, timeout=timeout
-        )  # type: aiohttp.ClientResponse
+        )
         time_elapsed = time.monotonic() - start
         remaining_timeout = timeout - time_elapsed if timeout else None
 
