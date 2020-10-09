@@ -1,4 +1,4 @@
-aiohttp<3.6
+aiohttp
 bottle
 bravado-core>=4.11.0
 bravado[integration-tests,fido]>=11.0.1

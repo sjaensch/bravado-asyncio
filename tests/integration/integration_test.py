@@ -16,6 +16,7 @@ from bravado.exception import BravadoTimeoutError
 from bravado.exception import HTTPBadRequest
 from bravado.exception import HTTPInternalServerError
 from bravado.exception import HTTPNotFound
+from bravado.requests_client import RequestsClient
 from bravado_core.model import Model
 
 from bravado_asyncio import http_client
@@ -168,6 +169,11 @@ def test_delete_query_args(swagger_client):
 
 
 def test_post_file_upload(swagger_client):
+    if isinstance(swagger_client.swagger_spec.http_client, RequestsClient):
+        pytest.xfail(
+            "Bug in aiohttp (used in the integration server) - see https://github.com/aio-libs/aiohttp/pull/4090"
+        )
+
     with open(
         os.path.join(os.path.dirname(__file__), "../../testing/sample.jpg"), "rb"
     ) as image:
@@ -181,6 +187,11 @@ def test_post_file_upload(swagger_client):
 
 
 def test_post_file_upload_stream_no_name(swagger_client):
+    if isinstance(swagger_client.swagger_spec.http_client, RequestsClient):
+        pytest.xfail(
+            "Bug in aiohttp (used in the integration server) - see https://github.com/aio-libs/aiohttp/pull/4090"
+        )
+
     with open(
         os.path.join(os.path.dirname(__file__), "../../testing/sample.jpg"), "rb"
     ) as image:
