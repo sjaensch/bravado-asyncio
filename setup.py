@@ -21,7 +21,7 @@ setup(
     url="https://github.com/sjaensch/bravado-asyncio",
     packages=["bravado_asyncio"],
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Stable",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: BSD License",
@@ -30,6 +30,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
+    python_requires=">=3.6",
     install_requires=["aiohttp>=3.3", "bravado>=11.0.0", "yelp-bytes"],
     extras_require={
         # as recommended by aiohttp, see http://aiohttp.readthedocs.io/en/stable/#library-installation
