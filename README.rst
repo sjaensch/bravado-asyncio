@@ -62,21 +62,19 @@ Installation
 Project status
 --------------
 
-The project is still work in progress, although it is successfully used in production at Yelp. We have an integration
+The project is successfully used in production at Yelp. We have an integration
 test suite that not only covers bravado-asyncio behavior, but also makes sure that behavior is equal to the (default)
 synchronous bravado HTTP client. That said, if you find a bug please file an issue!
-
-Internal as well as external interfaces may change at any time currently. That said, since bravado expects
-the HTTP client to adhere to a specific interface, those parts should be relatively stable.
-
 
 Development and contributing
 ----------------------------
 
 Developing ``bravado-asyncio`` requires a working installation of Python 3.6 with the
 `virtualenv <https://virtualenv.pypa.io/en/stable/>`_ package being installed.
-All other requirements will be installed in a virtualenv created in the ``venv`` directory. A full run of our testsuite
-runs the tests against Python 3.5 and 3.6, so if you want that to work you should install Python 3.5 as well.
+All other requirements will be installed in a virtualenv created in the ``venv`` directory.
+We also expect `make <https://www.gnu.org/software/make/>`_ to be installed. If you do not have it and do not want
+to install it then please refer to the `Makefile <https://github.com/sjaensch/bravado-asyncio/blob/master/Makefile>`_
+as to what commands need to be run for each target.
 
 1. Run ``make``. This will create the virtualenv you will use for development, with all runtime and development
    dependencies installed.
@@ -84,19 +82,20 @@ runs the tests against Python 3.5 and 3.6, so if you want that to work you shoul
    environment, please do so. If you prefer not to use aactivator, do ``source .activate.sh``.
 3. Make sure everything is set up correctly by running ``make test``.
 
-Since ``make test`` will run tests with Python 3.5 and 3.6, you'll get an error if only one of them is installed.
+Since ``make test`` will run tests with multiple Python versions, you'll get an error if one of them can't be found.
 You can ask tox to run tests with a specific Python version like so:
 
 .. code-block:: bash
 
-     $ tox -e py35
+     $ tox -e py38
 
-This will run tests with Python 3.5.
+This will run tests with Python 3.8.
 
 We do run linters that currently require Python 3.6. You can run them with ``tox -e pre-commit``.
 
-Travis (the continuous integration system) will run tests with both Python 3.5 and Python 3.6, so make sure you don't
-write code that works on Python 3.6 only.
+Travis (the continuous integration system) and Github Actions will run tests with all supported Python versions, on all
+supported platforms (Linux, macOS, Windows). Make sure you don't write code that works only on certain platforms or
+Python versions.
 
 Great, you're ready to go! If you have an improvement or bugfix, please submit a pull request.
 
