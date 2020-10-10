@@ -21,7 +21,7 @@ setup(
     url="https://github.com/sjaensch/bravado-asyncio",
     packages=["bravado_asyncio"],
     classifiers=[
-        "Development Status :: 5 - Stable",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: BSD License",

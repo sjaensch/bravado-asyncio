@@ -1,5 +1,9 @@
 Changelog
 =========
+2.0.1 (2020-10-10)
+------------------
+- Require at least Python 3.6 - PR #47
+
 2.0.0 (2020-10-09)
 ------------------
 - Cache aiohttp client session on the loop, not globally - PR #42. Thanks Nick Gaya for your contribution!
