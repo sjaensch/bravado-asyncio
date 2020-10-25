@@ -5,7 +5,7 @@ from typing import Dict
 from typing import TypeVar
 
 from bravado_core.response import IncomingResponse
-from multidict import CIMultiDict
+from multidict import CIMultiDictProxy
 
 from bravado_asyncio.definitions import AsyncioResponse
 
@@ -46,7 +46,7 @@ class AioHTTPResponseAdapter(IncomingResponse):
         )  # aiohttp 3.4.0 doesn't annotate this attribute correctly
 
     @property
-    def headers(self) -> CIMultiDict:
+    def headers(self) -> CIMultiDictProxy[str]:
         return self._delegate.headers
 
     def json(self, **_: Any) -> Dict[str, Any]:
