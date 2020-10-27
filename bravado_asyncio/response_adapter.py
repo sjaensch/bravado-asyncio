@@ -46,7 +46,7 @@ class AioHTTPResponseAdapter(IncomingResponse):
         )  # aiohttp 3.4.0 doesn't annotate this attribute correctly
 
     @property
-    def headers(self) -> CIMultiDictProxy[str]:
+    def headers(self) -> CIMultiDictProxy:
         return self._delegate.headers
 
     def json(self, **_: Any) -> Dict[str, Any]:

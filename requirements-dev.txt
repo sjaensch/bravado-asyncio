@@ -1,7 +1,7 @@
 aiohttp
 bottle
 bravado-core>=4.11.0
-bravado[integration-tests,fido]>=11.0.1
+bravado[integration-tests,fido]>=11.0.2
 coverage
 ephemeral_port_reserve
 mock<4
