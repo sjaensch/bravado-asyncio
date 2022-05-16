@@ -1,7 +1,7 @@
 # let's ignore symlinks, otherwise certain hooks complain on Windows
 exclude: '^(\.activate\.sh|docs/changelog\.rst)$'
 repos:
--   repo: git://github.com/pre-commit/pre-commit-hooks
+-   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.4.0
     hooks:
     -   id: check-added-large-files
