@@ -1,5 +1,9 @@
 Changelog
 =========
+2.0.2 (2022-11-11)
+------------------
+- use https:// instead of git:// in pre-commit URLs - PR #50
+
 2.0.1 (2020-10-10)
 ------------------
 - Require at least Python 3.6 - PR #47
