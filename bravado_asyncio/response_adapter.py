@@ -50,7 +50,7 @@ class AioHTTPResponseAdapter(IncomingResponse):
         return self._delegate.headers
 
     def json(self, **_: Any) -> Dict[str, Any]:
-        future = asyncio.run_coroutine_threadsafe(self._delegate.json(), self._loop)
+        future = asyncio.run_coroutine_threadsafe(self._delegate.json(content_type=None), self._loop)
         return future.result(self._remaining_timeout)
 
 
