@@ -1,8 +1,8 @@
 import asyncio
 import concurrent.futures
 import time
+from unittest import mock
 
-import mock
 import pytest
 
 from bravado_asyncio.definitions import AsyncioResponse
@@ -48,7 +48,9 @@ def test_future_adapter_timeout_error_class():
 
 @pytest.mark.asyncio
 async def test_asyncio_future_adapter(mock_response):
-    mock_future = mock.AsyncMock(name='mock future', side_effect=mock_result_with_sleep(mock_response))
+    mock_future = mock.AsyncMock(
+        name="mock future", side_effect=mock_result_with_sleep(mock_response)
+    )
 
     future_adapter = AsyncioFutureAdapter(mock_future())
     result = await future_adapter.result(timeout=5)

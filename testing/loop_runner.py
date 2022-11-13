@@ -1,9 +1,10 @@
 import asyncio
 import threading
 
+
 class LoopRunner(threading.Thread):
     def __init__(self, loop: asyncio.AbstractEventLoop) -> None:
-        threading.Thread.__init__(self, name='Test loop runner')
+        threading.Thread.__init__(self, name="Test loop runner")
         self.loop = loop
 
     def run(self) -> None:

@@ -4,7 +4,6 @@ bravado-core>=4.11.0
 bravado[integration-tests,fido]>=11.0.2
 coverage
 ephemeral_port_reserve
-mock
 mypy
 pytest
 pytest-asyncio

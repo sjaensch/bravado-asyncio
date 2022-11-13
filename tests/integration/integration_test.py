@@ -18,11 +18,11 @@ from bravado.exception import HTTPInternalServerError
 from bravado.exception import HTTPNotFound
 from bravado.requests_client import RequestsClient
 from bravado_core.model import Model
-from testing.integration_server import INTEGRATION_SERVER_HOST
-from testing.integration_server import start_integration_server
 
 from bravado_asyncio import http_client
 from bravado_asyncio import thread_loop
+from testing.integration_server import INTEGRATION_SERVER_HOST
+from testing.integration_server import start_integration_server
 
 
 shm_request_received = None
@@ -344,7 +344,10 @@ async def _test_asyncio_client(integration_server):
     # schedule our first coroutine (after _test_asyncio_client) in the default event loop
     future = asyncio.ensure_future(sleep_coroutine())
     client1 = get_swagger_client(integration_server, http_client.AsyncioClient())
-    client2 = get_swagger_client(integration_server, http_client.AsyncioClient(),)
+    client2 = get_swagger_client(
+        integration_server,
+        http_client.AsyncioClient(),
+    )
 
     # two tasks for the event loop running in a separate thread
     future1 = client1.store.getInventory()

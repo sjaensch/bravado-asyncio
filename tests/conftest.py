@@ -1,7 +1,7 @@
 import asyncio
 import logging
+from unittest import mock
 
-import mock
 import pytest
 
 

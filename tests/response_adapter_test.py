@@ -1,13 +1,13 @@
 import asyncio
+from unittest import mock
 
 import aiohttp
-import mock
 import pytest
-from testing.loop_runner import LoopRunner
 
 from bravado_asyncio.definitions import AsyncioResponse
 from bravado_asyncio.response_adapter import AioHTTPResponseAdapter
 from bravado_asyncio.response_adapter import AsyncioHTTPResponseAdapter
+from testing.loop_runner import LoopRunner
 
 
 @pytest.fixture(params=(AioHTTPResponseAdapter, AsyncioHTTPResponseAdapter))
@@ -18,9 +18,9 @@ def response_adapter(request, mock_loop):
 @pytest.fixture
 def mock_incoming_response():
     response = mock.Mock(name="incoming response", spec=aiohttp.ClientResponse)
-    response.text.return_value = 'response text'
-    response.read.return_value = b'raw response'
-    response.json.return_value = {'json': 'response'}
+    response.text.return_value = "response text"
+    response.read.return_value = b"raw response"
+    response.json.return_value = {"json": "response"}
     return response
 
 
@@ -57,20 +57,22 @@ def loop_runner():
 def test_thread_methods(asyncio_response, loop_runner):
     response_adapter = AioHTTPResponseAdapter(loop_runner.loop)(asyncio_response)
 
-    assert response_adapter.text == 'response text'
-    assert response_adapter.raw_bytes == b'raw response'
-    assert response_adapter.json() == {'json': 'response'}
+    assert response_adapter.text == "response text"
+    assert response_adapter.raw_bytes == b"raw response"
+    assert response_adapter.json() == {"json": "response"}
 
 
 @pytest.mark.asyncio
 async def test_asyncio_methods(asyncio_response):
-    response_adapter = AsyncioHTTPResponseAdapter(asyncio.get_event_loop())(asyncio_response)
+    response_adapter = AsyncioHTTPResponseAdapter(asyncio.get_event_loop())(
+        asyncio_response
+    )
 
     result = await response_adapter.text
-    assert result == 'response text'
+    assert result == "response text"
 
     result = await response_adapter.raw_bytes
-    assert result == b'raw response'
+    assert result == b"raw response"
 
     result = await response_adapter.json()
-    assert result == {'json': 'response'}
+    assert result == {"json": "response"}

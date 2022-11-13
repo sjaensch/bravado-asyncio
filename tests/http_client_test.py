@@ -1,7 +1,7 @@
 import asyncio
+from unittest import mock
 
 import aiohttp
-import mock
 import pytest
 from bravado.http_future import HttpFuture
 
