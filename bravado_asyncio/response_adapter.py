@@ -61,16 +61,16 @@ class AsyncioHTTPResponseAdapter(AioHTTPResponseAdapter):
     @property
     async def text(self) -> str:  # type: ignore
         return await asyncio.wait_for(
-            self._delegate.text(), timeout=self._remaining_timeout, loop=self._loop
+            self._delegate.text(), timeout=self._remaining_timeout
         )
 
     @property
     async def raw_bytes(self) -> bytes:  # type: ignore
         return await asyncio.wait_for(
-            self._delegate.read(), timeout=self._remaining_timeout, loop=self._loop
+            self._delegate.read(), timeout=self._remaining_timeout
         )
 
     async def json(self, **_: Any) -> Dict[str, Any]:  # type: ignore
         return await asyncio.wait_for(
-            self._delegate.json(), timeout=self._remaining_timeout, loop=self._loop
+            self._delegate.json(), timeout=self._remaining_timeout
         )
