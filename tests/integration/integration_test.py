@@ -175,7 +175,7 @@ def test_post_file_upload(swagger_client):
         )
 
     with open(
-        os.path.join(os.path.dirname(__file__), "../../testing/sample.jpg"), "rb"
+        os.path.join(os.path.dirname(__file__), "../testing/sample.jpg"), "rb"
     ) as image:
         result = (
             swagger_client.pet.uploadFile(petId=42, file=image, userId=12)
@@ -193,7 +193,7 @@ def test_post_file_upload_stream_no_name(swagger_client):
         )
 
     with open(
-        os.path.join(os.path.dirname(__file__), "../../testing/sample.jpg"), "rb"
+        os.path.join(os.path.dirname(__file__), "../testing/sample.jpg"), "rb"
     ) as image:
         bytes_io = io.BytesIO(image.read())  # BytesIO has no attribute 'name'
         result = (

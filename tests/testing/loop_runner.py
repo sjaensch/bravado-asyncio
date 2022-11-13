@@ -14,9 +14,5 @@ class LoopRunner(threading.Thread):
             if self.loop.is_running():
                 self.loop.close()
     
-    def run_coroutine(self, coroutine):
-        result = asyncio.run_coroutine_threadsafe(coroutine, self.loop)
-        return result.result()
-
     def stop(self) -> None:
         self.loop.call_soon_threadsafe(lambda: self.loop.stop())
