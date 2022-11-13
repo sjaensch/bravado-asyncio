@@ -2,54 +2,54 @@
 exclude: '^(\.activate\.sh|docs/changelog\.rst)$'
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.4.0
+    rev: v4.3.0
     hooks:
     -   id: check-added-large-files
-        language_version: python3.6
+        language_version: python3.8
     -   id: check-byte-order-marker
-        language_version: python3.6
+        language_version: python3.8
     -   id: check-json
-        language_version: python3.6
+        language_version: python3.8
     -   id: check-yaml
-        language_version: python3.6
+        language_version: python3.8
     -   id: debug-statements
-        language_version: python3.6
+        language_version: python3.8
     -   id: end-of-file-fixer
-        language_version: python3.6
+        language_version: python3.8
     -   id: fix-encoding-pragma
-        language_version: python3.6
+        language_version: python3.8
         args:
         - --remove
     -   id: name-tests-test
-        language_version: python3.6
+        language_version: python3.8
     -   id: trailing-whitespace
-        language_version: python3.6
+        language_version: python3.8
         # this hook doesn't seem to honor the global exclude setting
         exclude: '^(\.activate\.sh|docs/changelog\.rst)$'
     -   id: requirements-txt-fixer
-        language_version: python3.6
+        language_version: python3.8
         files: requirements-dev.txt
 -   repo: https://github.com/ambv/black
-    rev: 19.10b0
+    rev: 22.10.0
     hooks:
     -   id: black
-        language_version: python3.6
+        language_version: python3.8
 -   repo: https://gitlab.com/pycqa/flake8.git
-    rev: 3.7.9
+    rev: 3.9.2
     hooks:
     -   id: flake8
         exclude: ^docs
-        language_version: python3.6
+        language_version: python3.8
 -   repo: https://github.com/asottile/pyupgrade
-    rev: v1.25.1
+    rev: v3.2.2
     hooks:
     -   id: pyupgrade
-        language_version: python3.6
+        language_version: python3.8
 -   repo: https://github.com/asottile/reorder_python_imports
-    rev: v1.8.0
+    rev: v3.9.0
     hooks:
     -   id: reorder-python-imports
-        language_version: python3.6
+        language_version: python3.8
         args: [
             '--remove-import', 'from __future__ import absolute_import',
             '--remove-import', 'from __future__ import print_function',
