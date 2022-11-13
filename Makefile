@@ -14,7 +14,7 @@ docs: devenv
 	venv/bin/tox -e docs
 
 venv:
-	virtualenv -p python3.6 venv
+	virtualenv -p python3.8 venv
 
 .PHONY: clean
 clean:
