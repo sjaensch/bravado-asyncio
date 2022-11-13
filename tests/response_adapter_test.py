@@ -3,11 +3,11 @@ import asyncio
 import aiohttp
 import mock
 import pytest
+from testing.loop_runner import LoopRunner
 
 from bravado_asyncio.definitions import AsyncioResponse
 from bravado_asyncio.response_adapter import AioHTTPResponseAdapter
 from bravado_asyncio.response_adapter import AsyncioHTTPResponseAdapter
-from testing.loop_runner import LoopRunner
 
 
 @pytest.fixture(params=(AioHTTPResponseAdapter, AsyncioHTTPResponseAdapter))

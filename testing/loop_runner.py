@@ -13,6 +13,6 @@ class LoopRunner(threading.Thread):
         finally:
             if self.loop.is_running():
                 self.loop.close()
-    
+
     def stop(self) -> None:
         self.loop.call_soon_threadsafe(lambda: self.loop.stop())

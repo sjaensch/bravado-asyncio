@@ -18,11 +18,11 @@ from bravado.exception import HTTPInternalServerError
 from bravado.exception import HTTPNotFound
 from bravado.requests_client import RequestsClient
 from bravado_core.model import Model
+from testing.integration_server import INTEGRATION_SERVER_HOST
+from testing.integration_server import start_integration_server
 
 from bravado_asyncio import http_client
 from bravado_asyncio import thread_loop
-from testing.integration_server import INTEGRATION_SERVER_HOST
-from testing.integration_server import start_integration_server
 
 
 shm_request_received = None
@@ -175,7 +175,7 @@ def test_post_file_upload(swagger_client):
         )
 
     with open(
-        os.path.join(os.path.dirname(__file__), "../testing/sample.jpg"), "rb"
+        os.path.join(os.path.dirname(__file__), "../../testing/sample.jpg"), "rb"
     ) as image:
         result = (
             swagger_client.pet.uploadFile(petId=42, file=image, userId=12)
@@ -193,7 +193,7 @@ def test_post_file_upload_stream_no_name(swagger_client):
         )
 
     with open(
-        os.path.join(os.path.dirname(__file__), "../testing/sample.jpg"), "rb"
+        os.path.join(os.path.dirname(__file__), "../../testing/sample.jpg"), "rb"
     ) as image:
         bytes_io = io.BytesIO(image.read())  # BytesIO has no attribute 'name'
         result = (
